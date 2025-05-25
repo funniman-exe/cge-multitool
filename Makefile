@@ -1,9 +1,10 @@
 CC=g++
 CFLAGS=-I.
-DEPS = picosha2.h
+DEPS = thirdparty/picosha2.h thirdparty/json.hpp commands.h fastdl.h globs.h
+OBJ = main.o commands.o fastdl.o 
 
 %.o: %.c $(DEPS)
 	$(CC) -c -o $@ $< $(CFLAGS)
 
-hellomake: main.o
-	$(CC) -o ../cge-multitool main.o
+cge-multitool: $(OBJ)
+	$(CC) -o ../$@ $^ $(CFLAGS)

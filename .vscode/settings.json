@@ -13,7 +13,9 @@
         "xtree": "cpp",
         "fstream": "cpp",
         "xlocale": "cpp",
-        "valarray": "cpp"
+        "valarray": "cpp",
+        "exception": "cpp",
+        "typeinfo": "cpp"
     },
     "makefile.configureOnOpen": true
 }

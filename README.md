@@ -16,8 +16,8 @@ The cge7-193 Multitool is a tool created by funniman.exe to attempt to provide a
 ### Prerequisites
 - g++ compiler
 - The Windows operating system (reccomended: Windows 10+)
-- [The PicoSHA2 Header-only SHA256 Library](https://github.com/okdshin/PicoSHA2/blob/master/picosha2.h) (place in repository root folder)
-- [The nlohmann JSON Parser](https://github.com/nlohmann/json/releases/download/v3.12.0/json.hpp) (place in repository root folder)
+- [The PicoSHA2 Header-only SHA256 Library](https://github.com/okdshin/PicoSHA2/blob/master/picosha2.h) (place into the `thirdparty` folder)
+- [The nlohmann JSON Parser](https://github.com/nlohmann/json/releases/download/v3.12.0/json.hpp) (place into the `thirdparty` folder)
 
 ### Building
 Building is very simple; all you need to do is `cd` into the repository root folder and execute `make` in your shell.
