@@ -1,7 +1,9 @@
 #include <stdio.h>
 #include <iostream>
 #include <stdlib.h>
-#include <unistd.h>
+#include <direct.h>
+#include <string>
+#include <winsock2.h>
 #include <windows.h>
 #include <fstream>
 #include <filesystem>
@@ -17,6 +19,12 @@ char* gamePath;
 bool verbose = false;
 
 bool quitFunc = false;
+
+const char* ip = "79.127.217.197";
+const char* mainPort = "22912";
+const char* sourceTV = "22913";
+uint16_t mainPortInt = 22912;
+uint16_t sourceTVInt = 22913;
 
 bool parse( const char* cmd, const char* args )
 {

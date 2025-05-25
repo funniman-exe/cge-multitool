@@ -1,12 +1,13 @@
 #include <stdio.h>
 #include <iostream>
 #include <stdlib.h>
-#include <unistd.h>
+#include <direct.h>
+#include <string>
 #include <windows.h>
 #include <fstream>
 #include <filesystem>
-#include "thirdparty/picosha2.h"
-#include "thirdparty/json.hpp"
+#include <picosha2.h>
+#include <json.hpp>
 #include "fastdl.h"
 #include "globs.h"
 
@@ -35,7 +36,7 @@ void FastDL::fastdl( const char* args, bool isTempFile, bool noVerbose )
 
     //cout << tmp_a << endl;
 
-    if ( !filesystem::is_directory( tmp_a ) ) mkdir( tmp_a.c_str() );
+    if ( !filesystem::is_directory( tmp_a ) ) _mkdir( tmp_a.c_str() );
 
     tmp_a += args;
     size_t last_slash_pos = tmp_a.rfind( '/' );
@@ -47,7 +48,7 @@ void FastDL::fastdl( const char* args, bool isTempFile, bool noVerbose )
 
     //cout << tmp_a << endl;
 
-    if ( !filesystem::is_directory( tmp_a ) ) mkdir( tmp_a.c_str() );
+    if ( !filesystem::is_directory( tmp_a ) ) _mkdir( tmp_a.c_str() );
 
     tmp_a.clear();
 
@@ -70,7 +71,7 @@ void FastDL::fastdl( const char* args, bool isTempFile, bool noVerbose )
     if ( !noVerbose ) cout << "Validating HTTP Request Header...";
     if ( verbose && !noVerbose ) cout << endl;
 
-    FILE *fp = popen( cmdHead, "r" );
+    FILE *fp = _popen( cmdHead, "r" );
     string result;
 
     if ( fgets( responsebuff, sizeof(responsebuff), fp ) != nullptr )
@@ -79,7 +80,7 @@ void FastDL::fastdl( const char* args, bool isTempFile, bool noVerbose )
         result.erase( result.find_last_not_of( " \n\r\t" ) + 1 );
     }
 
-    pclose( fp );
+    _pclose( fp );
     delete[] cmdHead;
 
     if ( strstr( result.c_str(), "200 OK" ) == NULL )
@@ -140,7 +141,7 @@ void FastDL::fastdl_loop( const char* jsonFile )
 
     //cout << tmp_a << endl;
 
-    if ( !filesystem::is_directory( tmp_a ) ) mkdir( tmp_a.c_str() );
+    if ( !filesystem::is_directory( tmp_a ) ) _mkdir( tmp_a.c_str() );
 
     tmp_a.clear();
 

@@ -37,3 +37,4 @@ thirdparty/*
 # etc.
 *.zip
 *.json
+build/*
