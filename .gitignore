@@ -34,3 +34,6 @@
 # Thirdparty Includes
 picosha2.h
 json.hpp
+
+# etc.
+*.zip
