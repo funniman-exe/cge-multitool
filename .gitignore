@@ -36,3 +36,4 @@ thirdparty/*
 
 # etc.
 *.zip
+*.json
