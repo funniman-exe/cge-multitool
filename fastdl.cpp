@@ -33,7 +33,7 @@ void FastDL::fastdl( const char* args, bool isTempFile, bool noVerbose )
     tmp_a += "/tf/download/";
     if ( isTempFile ) tmp_a += "cge-temp/";
 
-    cout << tmp_a << endl;
+    //cout << tmp_a << endl;
 
     if ( !filesystem::is_directory( tmp_a ) ) mkdir( tmp_a.c_str() );
 
@@ -45,7 +45,7 @@ void FastDL::fastdl( const char* args, bool isTempFile, bool noVerbose )
         tmp_a.erase( last_slash_pos + 1 );
     }
 
-    cout << tmp_a << endl;
+    //cout << tmp_a << endl;
 
     if ( !filesystem::is_directory( tmp_a ) ) mkdir( tmp_a.c_str() );
 
@@ -134,7 +134,15 @@ void FastDL::fastdl_loop( const char* jsonFile )
     cmd += " --output ";
     cmd += targetPath;
 
-    //cout << cmd << endl;
+    string tmp_a;
+    tmp_a += gamePath;
+    tmp_a += "/cge-multitool";
+
+    //cout << tmp_a << endl;
+
+    if ( !filesystem::is_directory( tmp_a ) ) mkdir( tmp_a.c_str() );
+
+    tmp_a.clear();
 
     while ( true )
     {
