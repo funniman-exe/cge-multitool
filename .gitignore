@@ -30,3 +30,7 @@
 *.exe
 *.out
 *.app
+
+# Thirdparty Includes
+picosha2.h
+json.hpp
