@@ -124,7 +124,7 @@ int main( int argc, char *argv[] )
         strcpy( gamePath, path_str.substr( 0, path_str.find_last_of( "\\/" ) ).c_str() );
         chdir( gamePath );
 
-        cout << " [ DONE ] " << endl;
+        cout << " [ \033[34mDONE\033[0m ] " << endl;
 
         _sleep( 3000 );
         cout << "Starting multitool... " << endl;
@@ -137,6 +137,8 @@ int main( int argc, char *argv[] )
     }
 
     delete[] gamePath;
+
+    cout << "\033[0m";
 
     return 0;
 }

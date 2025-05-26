@@ -13,6 +13,7 @@ namespace CgeInterface {
     // Print Server Information
     const char* ParseEnvirons( A2S_ENVIRONMENT environment );
     void print_svr_info( const A2S_INFO *const info );
+    void print_svr_players( const A2S_PLAYER players[], const uint8_t player_count );
 
     // Info command - displays cge server info
     // TODO: FINISH ME

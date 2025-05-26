@@ -18,7 +18,7 @@ The cge7-193 Multitool is a tool created by funniman.exe to attempt to provide a
 - The Windows operating system (reccomended: Windows 10+)
 - [The PicoSHA2 Header-only SHA256 Library](https://github.com/okdshin/PicoSHA2/blob/master/picosha2.h) (place into the `thirdparty` folder)
 - [The nlohmann JSON Parser](https://github.com/nlohmann/json/releases/download/v3.12.0/json.hpp) (place into the `thirdparty` folder)
-- [BinaryAlien's libssq](https://github.com/BinaryAlien/libssq/tree/main) (clone repo to the `thirdparty` folder, build dynamic library)
+- [BinaryAlien's libssq](https://github.com/BinaryAlien/libssq/tree/main) (clone repo to the `thirdparty` folder)
 - [CMake](https://cmake.org) (Ensure that `CMake` has been added to the PATH)
 
 ### Fixing libssq

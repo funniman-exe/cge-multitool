@@ -85,7 +85,7 @@ void FastDL::fastdl( const char* args, bool isTempFile, bool noVerbose )
 
     if ( strstr( result.c_str(), "200 OK" ) == NULL )
     {
-        if ( !verbose && !noVerbose ) cout << " [ FAILED ]" << endl;
+        if ( !verbose && !noVerbose ) cout << " [ \033[31mFAILED\033[0m ]" << endl;
         cerr << "Invalid Request! ";
 
         if ( strstr( result.c_str(), "404 NOT FOUND" ) != NULL )
@@ -109,13 +109,13 @@ void FastDL::fastdl( const char* args, bool isTempFile, bool noVerbose )
         return;
     }
 
-    if ( !verbose && !noVerbose ) cout << " [ OK ]" << endl;
+    if ( !verbose && !noVerbose ) cout << " [ \033[34mOK\033[0m ]" << endl;
     if ( !noVerbose ) cout << "Downloading file from fastdl...";
     if ( verbose && !noVerbose ) cout << endl;
 
     system( cmdMain );
 
-    if ( !verbose && !noVerbose ) cout << " [ DONE ]" << endl;
+    if ( !verbose && !noVerbose ) cout << " [ \033[34mDONE\033[0m ]" << endl;
     if ( !isTempFile && !noVerbose ) cout << "Success! Downloaded file to \"" << gamePath << "/tf/download/" << args << "\"" << endl;
     if ( isTempFile && !noVerbose ) cout << "Success! Downloaded file to \"" << gamePath << "/tf/download/cge-temp/" << args << "\"" << endl;
 
@@ -197,7 +197,7 @@ void FastDL::fastdl_loop( const char* jsonFile )
                     file.close();
                     file2.close();
 
-                    cout << " [ DONE ] " << endl;
+                    cout << " [ \033[34mDONE\033[0m ] " << endl;
 
                     cout << "Original File's SHA256:    " << result << endl << "New File's SHA256:         " << result2 << endl;
 
@@ -208,15 +208,17 @@ void FastDL::fastdl_loop( const char* jsonFile )
                     }
                     else
                     {
-                        cout << "File \"" << viewFile << "\" differs! Updating local file..." << endl;
+                        cout << "\033[34mTHIS FILE DIFFERS!! THIS FILE DIFFERS!!" << endl << "THIS FILE DIFFERS!! THIS FILE DIFFERS!!" << endl << "THIS FILE DIFFERS!! THIS FILE DIFFERS!!" << endl;
+                        cout << "\033[0mFile \"" << viewFile << "\" differs! Updating local file..." << endl;
                         remove( tmp.c_str() );
                         remove( tmp2.c_str() );
                         fastdl( viewFile.c_str(), false, true );
+                        _sleep( 5000 );
                     }
                 }
                 else
                 {
-                    cout << " [ FAILED ] " << endl;
+                    cout << " [ \033[31mFAILED\033[0m ] " << endl;
                     cerr << "Unable to open file \"" << viewFile << "\"!" << endl;
                     if ( file.is_open() ) file.close();
                     if ( file2.is_open() ) file2.close();
@@ -224,7 +226,7 @@ void FastDL::fastdl_loop( const char* jsonFile )
             }
             else
             {
-                cout << "File \"" << viewFile << "\" does not exist locally, downloading..." << endl;
+                cout << "\033[31mFile \"" << viewFile << "\" does not exist locally, downloading...\033[0m" << endl;
                 fastdl( viewFile.c_str(), false, true );
             }
 
