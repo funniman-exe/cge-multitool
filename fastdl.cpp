@@ -96,9 +96,13 @@ void FastDL::fastdl( const char* args, bool isTempFile, bool noVerbose )
         {
             cerr << "Returned 403 on requested path \"" << args << "\". Ensure you specified an actual file, not a folder" << endl;
         }
+        else if ( strstr( result.c_str(), "429" ) != NULL )
+        {
+            cerr << "You are being Rate Limited by the host! Please wait a minute or so before continuing" << endl;
+        }
         else if ( strstr( result.c_str(), "Could not resolve host" ) != NULL )
         {
-            cerr << "Could not resolve the fastdl host! Check your internet and try again." << endl;
+            cerr << "Could not resolve the fastdl host! Check your internet and try again." << endl << "If the issue persists, contact @funniman.exe" << endl;
         }
         else
         {
@@ -135,6 +139,9 @@ void FastDL::fastdl_loop( const char* jsonFile )
     cmd += " --output ";
     cmd += targetPath;
 
+    string cmdHead = "curl -s -I https://raw.githubusercontent.com/funniman-exe/funniman-exe.github.io/refs/heads/main/ftp/interloper/";
+    cmdHead += jsonFile;
+
     string tmp_a;
     tmp_a += gamePath;
     tmp_a += "/cge-multitool";
@@ -147,7 +154,56 @@ void FastDL::fastdl_loop( const char* jsonFile )
 
     while ( true )
     {
+        cout << "Validating HTTP Request Header...";
+
+        FILE *fp = _popen( cmdHead.c_str(), "r" );
+        string result;
+
+        char responsebuff[128];
+
+        if ( fgets( responsebuff, sizeof(responsebuff), fp ) != nullptr )
+        {
+            result = responsebuff;
+            result.erase( result.find_last_not_of( " \n\r\t" ) + 1 );
+        }
+
+        _pclose( fp );
+
+        if ( strstr( result.c_str(), "200 OK" ) == NULL )
+        {
+            cout << " [ \033[31mFAILED\033[0m ]" << endl;
+            cerr << "Invalid Request! ";
+
+            if ( strstr( result.c_str(), "404 NOT FOUND" ) != NULL )
+            {
+                cerr << "Returned 404 on requested json \"" << jsonFile << "\". Please contact funniman.exe" << endl;
+            }
+            else if ( strstr( result.c_str(), "403 FORBIDDEN" ) != NULL )
+            {
+                cerr << "Returned 403 on requested json \"" << jsonFile << "\". Please contact funniman.exe" << endl;
+            }
+            else if ( strstr( result.c_str(), "429" ) != NULL )
+            {
+                cerr << "You are being Rate Limited by the host! Please wait a minute or so before continuing" << endl;
+            }
+            else if ( strstr( result.c_str(), "Could not resolve host" ) != NULL )
+            {
+                cerr << "Could not resolve the host! Check your internet and try again." << endl << "If the issue persists, contact @funniman.exe" << endl;
+            }
+            else
+            {
+                cerr << "Uncaught Error! The following is what was printed by cURL: " << endl << "  " << result << endl;
+            }
+
+            return;
+        }
+
+        cout << " [ \033[34mOK\033[0m ]" << endl;
+        cout << "Retrieving file \"" << jsonFile << "\" from host...";
+
         system( cmd.c_str() );
+
+        cout << " [ \033[34mDONE\033[0m ]" << endl;
 
         ifstream f( targetPath.c_str() );
         json data = json::parse( f );
@@ -213,7 +269,7 @@ void FastDL::fastdl_loop( const char* jsonFile )
                         remove( tmp.c_str() );
                         remove( tmp2.c_str() );
                         fastdl( viewFile.c_str(), false, true );
-                        _sleep( 5000 );
+                        _sleep( 3000 );
                     }
                 }
                 else
@@ -240,6 +296,11 @@ void FastDL::fastdl_loop( const char* jsonFile )
 void FastDL::fastdl_macro_view()
 {
     fastdl_loop( "view-files.json" );
+}
+
+void FastDL::fastdl_macro_view_min()
+{
+    fastdl_loop( "view-files-min.json" );
 }
 
 void FastDL::fastdl_macro_scrape()

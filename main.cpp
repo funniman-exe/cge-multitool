@@ -26,6 +26,9 @@ const char* sourceTV = "22913";
 uint16_t mainPortInt = 22912;
 uint16_t sourceTVInt = 22913;
 
+int verMajor = 0;
+int verMinor = 3;
+
 bool parse( const char* cmd, const char* args )
 {
     if ( strcmp( cmd, "cls" ) == 0 )
@@ -66,7 +69,13 @@ bool parse( const char* cmd, const char* args )
     }
     else if ( strcmp( cmd, "view" ) == 0 )
     {
-        FastDL::fastdl_macro_view();
+        if ( strcmp( args, "full" ) == 0 )
+            FastDL::fastdl_macro_view();
+        else if ( strcmp( args, "" ) == 0 || strcmp( args, " " ) == 0 || strcmp( args, "min" ) == 0 )
+            FastDL::fastdl_macro_view_min();
+        else
+            cerr << "fastdl -> macro (view) -> Invalid Syntax!" << endl;
+            
         return true;
     }
     else if ( strcmp( cmd, "scrape" ) == 0 )
@@ -126,12 +135,11 @@ int main( int argc, char *argv[] )
 
         cout << " [ \033[34mDONE\033[0m ] " << endl;
 
-        _sleep( 3000 );
-        cout << "Starting multitool... " << endl;
-        _sleep( 1000 );
+        cout << "Starting multitool..." << endl;
+        _sleep( 500 );
 
         system("cls");
-        cout << "Welcome to the \"cge7-193\" Multitool!" << endl << "   (c) 2025 funniman.exe" << endl << endl;
+        cout << "Welcome to the \"cge7-193\" Multitool! v" << verMajor << "." << verMinor << endl << "   (c) 2025 funniman.exe" << endl << endl;
 
         multitool();
     }

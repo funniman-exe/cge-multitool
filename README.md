@@ -14,18 +14,18 @@ The cge7-193 Multitool is a tool created by funniman.exe to attempt to provide a
 
 ## Building
 ### Prerequisites
-- GNU Compilation Tools (gcc, g++)
+- [MinGW](https://www.mingw-w64.org/downloads/) (I personally use the `WinLibs.com` builds, but you can use any builds that will work for you) (Ensure the `MinGW` `bin` folder is accessable via the `PATH`)
 - The Windows operating system (reccomended: Windows 10+)
 - [The PicoSHA2 Header-only SHA256 Library](https://github.com/okdshin/PicoSHA2/blob/master/picosha2.h) (place into the `thirdparty` folder)
 - [The nlohmann JSON Parser](https://github.com/nlohmann/json/releases/download/v3.12.0/json.hpp) (place into the `thirdparty` folder)
-- [BinaryAlien's libssq](https://github.com/BinaryAlien/libssq/tree/main) (clone repo to the `thirdparty` folder)
-- [CMake](https://cmake.org) (Ensure that `CMake` has been added to the PATH)
+- [BinaryAlien's libssq](https://github.com/BinaryAlien/libssq) (clone repo to the `thirdparty` folder)
+- [CMake](https://cmake.org) (Ensure that `CMake` has been added to the `PATH`)
 
 ### Fixing libssq
 The `libssq` library has a typo that must be fixed before it can be compiled.
 Open the file `src/error.c`, and on line 36, remove the `,` from the end of the line.
 
-You must also add the line `target_link_libraries(ssq ws2_32.lib)` after the `add_library(ssq)` line in `CMakeLists.txt`.
+~~You must also add the line `target_link_libraries(ssq ws2_32.lib)` after the `add_library(ssq)` line in `CMakeLists.txt`.~~ Unecessary? Requires more testing...
 
 ### Special libssq building instructions
 You must Build libssq as follows (as opposed to as instructed in it's github repository):
@@ -41,3 +41,12 @@ cmake -B build -G "MinGW Makefiles"
 cmake --build build
 ```
 The `cge-multitool.exe` executable will be built in the directory previously specified.
+
+## Isssues -- libssq
+### Cannot open include file: 'stdbool.h'
+Ensure that you are building using the specified build commands, and ensure that the `PATH` entry for the `MinGW` `bin` folder is placed above any Microsoft compilers (ex: `MSVC420`)
+
+## Issues -- cge-multitool
+### Crash when running info command
+This error is caused by using a Microsoft compiler
+Ensure that you are building using the specified build commands, and ensure that the `PATH` entry for the `MinGW` `bin` folder is placed above any Microsoft compilers (ex: `MSVC420`)

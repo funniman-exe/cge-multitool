@@ -16,7 +16,7 @@ using namespace std;
 
 bool CgeInterface::ping()
 {
-    cout << "Pinging \"cge7-193\"..." << endl;
+    cout << "Pinging \"cge7-193\"...";
 
     char responsebuff[1000];
     string cmd = "ping -w 2000 ";
@@ -28,8 +28,11 @@ bool CgeInterface::ping()
 
     if ( stat == 1 )
     {
+        cout << " [ \033[31mFAILED\033[0m ]" << endl;
         return false;
     }
+
+    cout << " [ \033[34mDONE\033[0m ]" << endl;
 
     if ( verbose ) cout << "\"cge7-193\" ping information:" << endl << responsebuff << endl;
     return true;
@@ -37,7 +40,7 @@ bool CgeInterface::ping()
 
 void CgeInterface::help()
 {
-    cout << "The \"cge7-193\" Multitool" << endl << "   (c) 2025 funniman.exe" << endl << endl;
+    cout << "The \"cge7-193\" Multitool v" << verMajor << "." << verMinor << endl << "   (c) 2025 funniman.exe" << endl << endl;
     cout << "Type \"help\" - Brings up this menu." << endl;
     cout << "Type \"reset\" or \"restart\" - Restart the multitool." << endl;
     cout << "Type \"quit\" or \"exit\" - Exit the multitool." << endl;
@@ -45,7 +48,7 @@ void CgeInterface::help()
     cout << "Type \"info\" - Print \"cge7-193\" server information." << endl;
     cout << "Type \"fastdl <filepath (no quotes)>\" - Download requested file from fastdl." << endl << endl;
     cout << "fastdl quick macros:" << endl;
-    cout << "   Type \"view\" - Check if view render assets have changed" << endl;
+    cout << "   Type \"view < min/all (assumes min) >\" - Check if view render assets have changed" << endl;
     cout << "   Type \"scrape\" - Check if known maps have changed" << endl;
 }
 
@@ -97,7 +100,7 @@ void CgeInterface::print_svr_info( const A2S_INFO *const info )
 
 void CgeInterface::print_svr_players( const A2S_PLAYER players[], const uint8_t player_count )
 {
-    cout << endl << "--------------- Players ---------------" << endl;
+    cout << "--------------- Players ---------------" << endl;
     for ( uint8_t i = 0; i < player_count; ++i )
     {
         printf( "Player #%i          - \"%s\"\n", i+1, players[i].name );
@@ -113,14 +116,17 @@ void CgeInterface::info()
 
     if ( !ping() )
     {
-        cout << "Failed to ping \"cge7-193\", unable to grab server info." << endl;
+        cout << "Connection Timeout: Host did not respond. Check your internet and try again." << endl;
         return;
     }
+
+    cout << "Establishing connection to host...";
 
     WSADATA wsa_data;
     if ( WSAStartup( MAKEWORD(2, 2), &wsa_data ) != NO_ERROR )
     {
-        cerr << "ERR: WSAStartup failed with code " << WSAGetLastError() << endl;
+        cout << " [ \033[31mFAILED\033[0m ]" << endl;
+        cerr << "WSAStartup failed with code " << WSAGetLastError() << endl;
         return;
     }
 
@@ -128,29 +134,42 @@ void CgeInterface::info()
     SSQ_SERVER *server = ssq_server_new( ip, mainPortInt );
     if ( server == NULL )
     {
-        cerr << "ssq_server_new: memory exhausted" << endl;
+        cout << " [ \033[31mFAILED\033[0m ]" << endl;
+        cerr << "Memory Exhausted" << endl;
+        WSACleanup();
         return;
     }
     else if ( !ssq_server_eok( server ) )
     {
-        cerr << "ssq_server_new: " << ip << ": " << ssq_server_emsg( server ) << endl;
+        cerr << ssq_server_emsg( server ) << endl;
         ssq_server_free( server );
+        WSACleanup();
         return;
     }
     ssq_server_timeout( server, ( SSQ_TIMEOUT_SELECTOR )( SSQ_TIMEOUT_RECV | SSQ_TIMEOUT_SEND ), 10000 );
+
+    cout << " [ \033[34mDONE\033[0m ]" << endl;
+    cout << "Requesting Host for info...";
 
     /* A2S_INFO */
     A2S_INFO *info = ssq_info( server );
     if ( ssq_server_eok( server ) )
     {
+        cout << " [ \033[34mDONE\033[0m ]" << endl << endl;
         print_svr_info( info );
         ssq_info_free( info );
     }
     else
     {
+        cout << " [ \033[31mFAILED\033[0m ]" << endl;
         cerr << "ssq_info: " << ssq_server_emsg( server ) << endl;
         ssq_server_eclr( server );
+        ssq_server_free( server );
+        WSACleanup();
+        return;
     }
+
+    cout << endl << "Requesting Host for players...";
 
     /* A2S_PLAYER */
     if ( info->players > 0 )
@@ -159,11 +178,14 @@ void CgeInterface::info()
         A2S_PLAYER *players = ssq_player( server, &player_count );
         if ( ssq_server_eok( server ) )
         {
+            cout << " [ \033[34mDONE\033[0m ]" << endl << endl;
             print_svr_players( players, player_count );
             ssq_player_free( players, player_count );
-        } else
+        }
+        else
         {
-            cerr << "ssq_player: %s\n" << ssq_server_emsg( server );
+            cout << " [ \033[31mFAILED\033[0m ]" << endl;
+            cerr << ssq_server_emsg( server ) << endl;
             ssq_server_eclr( server );
         }
     }
