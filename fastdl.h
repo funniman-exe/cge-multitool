@@ -12,5 +12,6 @@ namespace FastDL {
     void fastdl_macro_view();
 
     // FastDL Macro: Invokes fastdl_loop with the KNOWN MAPS json
+    void fastdl_macro_scrape_min();
     void fastdl_macro_scrape();
 }

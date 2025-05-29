@@ -48,8 +48,8 @@ void CgeInterface::help()
     cout << "Type \"info\" - Print \"cge7-193\" server information." << endl;
     cout << "Type \"fastdl <filepath (no quotes)>\" - Download requested file from fastdl." << endl << endl;
     cout << "fastdl quick macros:" << endl;
-    cout << "   Type \"view < min/all (assumes min) >\" - Check if view render assets have changed" << endl;
-    cout << "   Type \"scrape\" - Check if known maps have changed" << endl;
+    cout << "   Type \"view <min/full (assumes min)>\" - Check if view render assets have changed" << endl;
+    cout << "   Type \"scrape <min/full (assumes min)>\" - Check if known maps have changed" << endl;
 }
 
 const char* CgeInterface::ParseEnvirons( A2S_ENVIRONMENT environment )

@@ -80,7 +80,13 @@ bool parse( const char* cmd, const char* args )
     }
     else if ( strcmp( cmd, "scrape" ) == 0 )
     {
-        FastDL::fastdl_macro_scrape();
+        if ( strcmp( args, "full" ) == 0 )
+            FastDL::fastdl_macro_scrape();
+        else if ( strcmp( args, "" ) == 0 || strcmp( args, " " ) == 0 || strcmp( args, "min" ) == 0 )
+            FastDL::fastdl_macro_scrape_min();
+        else
+            cerr << "fastdl -> macro (scrape) -> Invalid Syntax!" << endl;
+            
         return true;
     }
     else

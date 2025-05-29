@@ -293,6 +293,8 @@ void FastDL::fastdl_loop( const char* jsonFile )
     }
 }
 
+// macros
+
 void FastDL::fastdl_macro_view()
 {
     fastdl_loop( "view-files.json" );
@@ -306,4 +308,9 @@ void FastDL::fastdl_macro_view_min()
 void FastDL::fastdl_macro_scrape()
 {
     fastdl_loop( "known-maps.json" );
+}
+
+void FastDL::fastdl_macro_scrape_min()
+{
+    fastdl_loop( "known-maps-min.json" );
 }

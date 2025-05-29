@@ -43,10 +43,10 @@ cmake --build build
 The `cge-multitool.exe` executable will be built in the directory previously specified.
 
 ## Isssues -- libssq
-### Cannot open include file: 'stdbool.h'
+- ### Cannot open include file: 'stdbool.h'
 Ensure that you are building using the specified build commands, and ensure that the `PATH` entry for the `MinGW` `bin` folder is placed above any Microsoft compilers (ex: `MSVC420`)
 
 ## Issues -- cge-multitool
-### Crash when running info command
+- ### Crash when running info command
 This error is caused by using a Microsoft compiler
 Ensure that you are building using the specified build commands, and ensure that the `PATH` entry for the `MinGW` `bin` folder is placed above any Microsoft compilers (ex: `MSVC420`)
