@@ -8,11 +8,16 @@
 #include <cinttypes>
 #include <filesystem>
 #include <ssq/a2s.h>
-#include "fastdl.h"
-#include "commands.h"
-#include "globs.h"
+#include <json.hpp>
 
 using namespace std;
+
+using json = nlohmann::json;
+
+#include "fastdl.h"
+#include "config.h"
+#include "commands.h"
+#include "globs.h"
 
 bool CgeInterface::ping()
 {
@@ -44,12 +49,14 @@ void CgeInterface::help()
     cout << "Type \"help\" - Brings up this menu." << endl;
     cout << "Type \"reset\" or \"restart\" - Restart the multitool." << endl;
     cout << "Type \"quit\" or \"exit\" - Exit the multitool." << endl;
-    cout << "Type \"verbose\" - Toggle Verbose mode." << endl;
     cout << "Type \"info\" - Print \"cge7-193\" server information." << endl;
     cout << "Type \"fastdl <filepath (no quotes)>\" - Download requested file from fastdl." << endl << endl;
     cout << "fastdl quick macros:" << endl;
     cout << "   Type \"view <min/full (assumes min)>\" - Check if view render assets have changed" << endl;
-    cout << "   Type \"scrape <min/full (assumes min)>\" - Check if known maps have changed" << endl;
+    cout << "   Type \"scrape <min/full (assumes min)>\" - Check if known maps have changed" << endl << endl;
+    cout << "Config options:" << endl;
+    cout << "   Type \"gamepath\" - Edit the specified path to TF2." << endl;
+    cout << "   Type \"verbose\" - Toggle Verbose mode." << endl;
 }
 
 const char* CgeInterface::ParseEnvirons( A2S_ENVIRONMENT environment )

@@ -15,7 +15,8 @@
         "xlocale": "cpp",
         "valarray": "cpp",
         "exception": "cpp",
-        "typeinfo": "cpp"
+        "typeinfo": "cpp",
+        "format": "cpp"
     },
     "makefile.configureOnOpen": true
 }

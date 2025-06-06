@@ -5,7 +5,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 
 project(cge-multitool VERSION 0.3)
 
-add_executable(cge-multitool commands.cpp fastdl.cpp main.cpp)
+add_executable(cge-multitool commands.cpp fastdl.cpp config.cpp main.cpp)
 
 if(WIN32)
   set(plat_suffix "-win")

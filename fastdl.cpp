@@ -8,12 +8,14 @@
 #include <filesystem>
 #include <picosha2.h>
 #include <json.hpp>
-#include "fastdl.h"
-#include "globs.h"
 
 using namespace std;
 
 using json = nlohmann::json;
+
+#include "fastdl.h"
+#include "config.h"
+#include "globs.h"
 
 void FastDL::fastdl( const char* args, bool isTempFile, bool noVerbose )
 {
@@ -29,29 +31,6 @@ void FastDL::fastdl( const char* args, bool isTempFile, bool noVerbose )
         return;
     }
 
-    string tmp_a;
-    tmp_a += gamePath;
-    tmp_a += "/tf/download/";
-    if ( isTempFile ) tmp_a += "cge-temp/";
-
-    //cout << tmp_a << endl;
-
-    if ( !filesystem::is_directory( tmp_a ) ) _mkdir( tmp_a.c_str() );
-
-    tmp_a += args;
-    size_t last_slash_pos = tmp_a.rfind( '/' );
-
-    if ( last_slash_pos != std::string::npos )
-    {
-        tmp_a.erase( last_slash_pos + 1 );
-    }
-
-    //cout << tmp_a << endl;
-
-    if ( !filesystem::is_directory( tmp_a ) ) _mkdir( tmp_a.c_str() );
-
-    tmp_a.clear();
-
     char responsebuff[128];
     char* cmdHead = new char[512];
     if ( !verbose ) strcpy( cmdHead, "curl -s -I https://wavespray.dathost.net/fastdl/teamfortress2/679d9656b8573d37aa848d60/" );
@@ -61,8 +40,8 @@ void FastDL::fastdl( const char* args, bool isTempFile, bool noVerbose )
     if ( !verbose ) strcpy( cmdMain, "curl -s https://wavespray.dathost.net/fastdl/teamfortress2/679d9656b8573d37aa848d60/" );
     if ( verbose ) strcpy( cmdMain, "curl https://wavespray.dathost.net/fastdl/teamfortress2/679d9656b8573d37aa848d60/" );
     strcat( cmdMain, args );
-    if ( !isTempFile ) strcat( cmdMain, " --output tf/download/" );
-    if ( isTempFile ) strcat( cmdMain, " --output tf/download/cge-temp/" );
+    if ( !isTempFile ) strcat( cmdMain, " --create-dirs --output tf/download/" );
+    if ( isTempFile ) strcat( cmdMain, " --create-dirs --output tf/download/cge-temp/" );
     strcat( cmdMain, args );
 
     //cout << cmdHead << endl;
@@ -131,26 +110,16 @@ void FastDL::fastdl_loop( const char* jsonFile )
     //cout << "Type 'q' to exit the loop" << endl;
     cout << "To exit the loop, you must quit the application" << endl;
 
-    string targetPath = "cge-multitool/";
+    string targetPath = appDataPath;
     targetPath += jsonFile;
 
     string cmd = "curl -s https://raw.githubusercontent.com/funniman-exe/funniman-exe.github.io/refs/heads/main/ftp/interloper/";
     cmd += jsonFile;
-    cmd += " --output ";
+    cmd += " --create-dirs --output ";
     cmd += targetPath;
 
     string cmdHead = "curl -s -I https://raw.githubusercontent.com/funniman-exe/funniman-exe.github.io/refs/heads/main/ftp/interloper/";
     cmdHead += jsonFile;
-
-    string tmp_a;
-    tmp_a += gamePath;
-    tmp_a += "/cge-multitool";
-
-    //cout << tmp_a << endl;
-
-    if ( !filesystem::is_directory( tmp_a ) ) _mkdir( tmp_a.c_str() );
-
-    tmp_a.clear();
 
     while ( true )
     {
