@@ -7,6 +7,7 @@ The cge7-193 Multitool is a tool created by funniman.exe to attempt to provide a
 - Scraping known Fastdl files for changes
 - TF2 Server information
 - TF2 Server status
+- Configuration via `prefs.json`
 
 ### Upcoming features
 - Scraping for new/unknown Fastdl files
