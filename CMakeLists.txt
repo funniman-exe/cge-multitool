@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.23)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
-project(cge-multitool VERSION 0.3)
+project(cge-multitool VERSION 0.4)
 
 add_executable(cge-multitool commands.cpp fastdl.cpp config.cpp main.cpp)
 

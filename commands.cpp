@@ -176,11 +176,11 @@ void CgeInterface::info()
         return;
     }
 
-    cout << endl << "Requesting Host for players...";
-
     /* A2S_PLAYER */
     if ( info->players > 0 )
     {
+        cout << endl << "Requesting Host for players...";
+
         uint8_t player_count = 0;
         A2S_PLAYER *players = ssq_player( server, &player_count );
         if ( ssq_server_eok( server ) )
@@ -195,6 +195,10 @@ void CgeInterface::info()
             cerr << ssq_server_emsg( server ) << endl;
             ssq_server_eclr( server );
         }
+    }
+    else
+    {
+        cout << endl << "-----------No Players Online-----------" << endl;
     }
 
     ssq_server_free( server );
