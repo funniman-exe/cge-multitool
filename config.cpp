@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <iostream>
 #include <stdlib.h>
+#include <direct.h>
 #include <string>
 #include <winsock2.h>
 #include <windows.h>
@@ -23,6 +24,11 @@ namespace ConfigInterface {
 
 bool ConfigInterface::Init()
 {
+    strcat( appDataPath, "/funniman-software/" );
+    _mkdir( appDataPath );
+    strcat( appDataPath, "cge-multitool/" );
+    _mkdir( appDataPath );
+
     string tmp = appDataPath;
     tmp += configFile;
 
@@ -37,11 +43,14 @@ bool ConfigInterface::Init()
         out << setw( 4 ) << conf << endl;
         out.close();
 
+        //cout << "Wrote config file to \"" << tmp << "\"" << endl;
+
         return false;
     }
     else
     {
         conf = json::parse( in );
+        //cout << "Finished parsing config file at \"" << tmp << "\"" << endl;
         return true;
     }
 }

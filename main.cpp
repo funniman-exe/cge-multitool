@@ -36,6 +36,7 @@ const int verMajor = 0;
 const int verMinor = 4;
 
 char* appDataPath;
+char* appDataPathRaw;
 const char* configFile = "prefs.json";
 
 bool parse( const char* cmd, const char* args )
@@ -94,6 +95,8 @@ bool parse( const char* cmd, const char* args )
     }
     else if ( strcmp( cmd, "gamepath" ) == 0 )
     {
+        gamePath.clear();
+
         while( !filesystem::is_directory( gamePath ) )
         {
             cout << "Please input a valid path to your TF2 Install folder (without quotes)" << endl << ">> ";
@@ -104,6 +107,7 @@ bool parse( const char* cmd, const char* args )
         }
 
         ConfigInterface::UpdateConfStr( "gamepath", gamePath );
+        chdir( gamePath.c_str() );
             
         return true;
     }
@@ -162,7 +166,6 @@ int main( int argc, char *argv[] )
 
         SHGetKnownFolderPath( FOLDERID_RoamingAppData, 0, NULL, tmp );
         wcstombs( appDataPath, *tmp, sizeof( char ) * MAX_PATH );
-        strcat( appDataPath, "/funniman-software/cge-multitool/" );
 
         delete tmp;
 
@@ -207,6 +210,8 @@ int main( int argc, char *argv[] )
 
             verbose = ConfigInterface::GetConfBool( "verbose" );
         }
+
+        chdir( gamePath.c_str() );
 
         cout << "Starting multitool..." << endl;
         _sleep( 500 );
