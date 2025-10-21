@@ -1,5 +1,8 @@
 #include <json.hpp>
 
+#define FUNNIMAN_SOFTWARE "funniman-software"
+#define APPDATA_PATH "cge-multitool"
+
 namespace ConfigInterface {
     // JSON
     extern json conf;

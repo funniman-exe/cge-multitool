@@ -26,14 +26,14 @@ bool verbose = false;
 
 bool quitFunc = false;
 
-const char* ip = "79.127.217.197";
+const char* ip = "169.150.249.133";
 const char* mainPort = "22912";
 const char* sourceTV = "22913";
 const uint16_t mainPortInt = 22912;
 const uint16_t sourceTVInt = 22913;
 
 const int verMajor = 0;
-const int verMinor = 4;
+const int verMinor = 5;
 
 char* appDataPath;
 const char* configFile = "prefs.json";
@@ -162,7 +162,6 @@ int main( int argc, char *argv[] )
 
         SHGetKnownFolderPath( FOLDERID_RoamingAppData, 0, NULL, tmp );
         wcstombs( appDataPath, *tmp, sizeof( char ) * MAX_PATH );
-        strcat( appDataPath, "/funniman-software/cge-multitool/" );
 
         delete tmp;
 
@@ -185,7 +184,7 @@ int main( int argc, char *argv[] )
         {
             gamePath = ConfigInterface::GetConfStr( "gamepath" );
 
-            cout << gamePath << endl;
+            //cout << gamePath << endl;
 
             if ( !filesystem::is_directory( gamePath ) )
             {
@@ -209,7 +208,7 @@ int main( int argc, char *argv[] )
         }
 
         cout << "Starting multitool..." << endl;
-        _sleep( 500 );
+        //_sleep( 500 );
 
         system("cls");
         cout << "Welcome to the \"cge7-193\" Multitool! v" << verMajor << "." << verMinor << endl << "   (c) 2025 funniman.exe" << endl << endl;

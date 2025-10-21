@@ -40,9 +40,13 @@ void FastDL::fastdl( const char* args, bool isTempFile, bool noVerbose )
     if ( !verbose ) strcpy( cmdMain, "curl -s https://wavespray.dathost.net/fastdl/teamfortress2/679d9656b8573d37aa848d60/" );
     if ( verbose ) strcpy( cmdMain, "curl https://wavespray.dathost.net/fastdl/teamfortress2/679d9656b8573d37aa848d60/" );
     strcat( cmdMain, args );
-    if ( !isTempFile ) strcat( cmdMain, " --create-dirs --output tf/download/" );
-    if ( isTempFile ) strcat( cmdMain, " --create-dirs --output tf/download/cge-temp/" );
+    strcat( cmdMain, " --create-dirs --output \"" );
+    strcat( cmdMain, gamePath.c_str() );
+
+    if ( !isTempFile ) strcat( cmdMain, "/tf/download/" );
+    if ( isTempFile ) strcat( cmdMain, "/tf/download/cge-temp/" );
     strcat( cmdMain, args );
+    strcat( cmdMain, "\"" );
 
     //cout << cmdHead << endl;
     //cout << cmdMain << endl;

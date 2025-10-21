@@ -23,7 +23,19 @@ namespace ConfigInterface {
 
 bool ConfigInterface::Init()
 {
+    strcat( appDataPath, "\\" FUNNIMAN_SOFTWARE "\\" );
+
     string tmp = appDataPath;
+
+    if ( !filesystem::exists( tmp ) )
+        filesystem::create_directory( tmp );
+
+    strcat( appDataPath, APPDATA_PATH "\\" );
+    tmp += APPDATA_PATH "\\";
+
+    if ( !filesystem::exists( tmp ) )
+        filesystem::create_directory( tmp );
+
     tmp += configFile;
 
     ifstream in( tmp.c_str() );

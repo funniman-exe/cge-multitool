@@ -90,7 +90,7 @@ void CgeInterface::print_svr_info( const A2S_INFO *const info )
     cout << "SourceTV Status    - " << ( sourceTVActive ? "Online" : "Inactive" ) << endl;
     if ( sourceTVActive ) cout << "SourceTV Port      - " << info->stv_port << endl;
     cout << "Current Map        - " << ( strcmp( info->map, "" ) != 0 ? info->map : "N/A" ) << ( strcmp( info->map, "" ) != 0 ? ".bsp" : "" ) << endl;
-    if ( info->bots == info->players )
+    if ( ( info->bots == info->players ) && ( info->players > 0 ) )
         printf( "Players            - %" PRIu8 "/%" PRIu8 " - (All Bots)\n",
         info->players, info->max_players );
     else if ( info->bots > 0 )
