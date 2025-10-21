@@ -19,17 +19,24 @@ using json = nlohmann::json;
 #include "commands.h"
 #include "globs.h"
 
+namespace CgeInterface
+{
+    WSADATA wsa_data;
+    SSQ_SERVER* server = nullptr;
+    A2S_INFO* _a2sinfo = nullptr;
+}
+
 bool CgeInterface::ping()
 {
-    cout << "Pinging \"cge7-193\"...";
+    cout << "Pinging host...";
 
-    char responsebuff[1000];
+    char responsebuff[ 1000 ];
     string cmd = "ping -w 2000 ";
     cmd += ip;
     FILE *fp = _popen( cmd.c_str(), "r" );
-    while ( fgets( responsebuff, sizeof(responsebuff), fp) );
+    while ( fgets( responsebuff, sizeof( responsebuff ), fp ) );
 
-    int stat = _pclose(fp);
+    int stat = _pclose( fp );
 
     if ( stat == 1 )
     {
@@ -37,7 +44,7 @@ bool CgeInterface::ping()
         return false;
     }
 
-    cout << " [ \033[34mDONE\033[0m ]" << endl;
+    cout << " [ \033[34mOK\033[0m ]" << endl;
 
     if ( verbose ) cout << "\"cge7-193\" ping information:" << endl << responsebuff << endl;
     return true;
@@ -52,8 +59,9 @@ void CgeInterface::help()
     cout << "Type \"info\" - Print \"cge7-193\" server information." << endl;
     cout << "Type \"fastdl <filepath (no quotes)>\" - Download requested file from fastdl." << endl << endl;
     cout << "fastdl quick macros:" << endl;
-    cout << "   Type \"view <min/full (assumes min)>\" - Check if view render assets have changed" << endl;
-    cout << "   Type \"scrape <min/full (assumes min)>\" - Check if known maps have changed" << endl << endl;
+    cout << "   Type \"view <min/full (assumes min)>\" - Check if view render assets have changed." << endl;
+    cout << "   Type \"scrape <min/full (assumes min)>\" - Check if known maps have changed." << endl;
+    cout << "   Type \"current-map\" or \"map\" - Download the server's current map from fastdl." << endl << endl;
     cout << "Config options:" << endl;
     cout << "   Type \"gamepath\" - Edit the specified path to TF2." << endl;
     cout << "   Type \"verbose\" - Toggle Verbose mode." << endl;
@@ -116,55 +124,52 @@ void CgeInterface::print_svr_players( const A2S_PLAYER players[], const uint8_t 
     }
 }
 
-void CgeInterface::info()
+bool CgeInterface::initServer()
 {
-    //cout << "This command is non-functional" << endl;
-    //return;
-
     if ( !ping() )
     {
         cout << "Connection Timeout: Host did not respond. Check your internet and try again." << endl;
-        return;
+        return false;
     }
 
     cout << "Establishing connection to host...";
 
-    WSADATA wsa_data;
-    if ( WSAStartup( MAKEWORD(2, 2), &wsa_data ) != NO_ERROR )
+    if ( WSAStartup( MAKEWORD( 2, 2 ), &wsa_data ) != NO_ERROR )
     {
         cout << " [ \033[31mFAILED\033[0m ]" << endl;
         cerr << "WSAStartup failed with code " << WSAGetLastError() << endl;
-        return;
+        return false;
     }
 
     /* Initialization */
-    SSQ_SERVER *server = ssq_server_new( ip, mainPortInt );
+    server = ssq_server_new( ip, mainPortInt );
     if ( server == NULL )
     {
         cout << " [ \033[31mFAILED\033[0m ]" << endl;
         cerr << "Memory Exhausted" << endl;
         WSACleanup();
-        return;
+        return false;
     }
     else if ( !ssq_server_eok( server ) )
     {
         cerr << ssq_server_emsg( server ) << endl;
+        ssq_server_eclr( server );
         ssq_server_free( server );
         WSACleanup();
-        return;
+        return false;
     }
     ssq_server_timeout( server, ( SSQ_TIMEOUT_SELECTOR )( SSQ_TIMEOUT_RECV | SSQ_TIMEOUT_SEND ), 10000 );
 
     cout << " [ \033[34mDONE\033[0m ]" << endl;
-    cout << "Requesting Host for info...";
+    cout << "Requesting host for info...";
 
     /* A2S_INFO */
-    A2S_INFO *info = ssq_info( server );
+    _a2sinfo = ssq_info( server );
+
     if ( ssq_server_eok( server ) )
     {
         cout << " [ \033[34mDONE\033[0m ]" << endl << endl;
-        print_svr_info( info );
-        ssq_info_free( info );
+        return true;
     }
     else
     {
@@ -173,34 +178,68 @@ void CgeInterface::info()
         ssq_server_eclr( server );
         ssq_server_free( server );
         WSACleanup();
-        return;
+        return false;
     }
+}
 
-    /* A2S_PLAYER */
-    if ( info->players > 0 )
+void CgeInterface::info()
+{
+    //cout << "This command is non-functional" << endl;
+    //return;
+
+    if ( initServer() )
     {
-        cout << endl << "Requesting Host for players...";
+        print_svr_info( _a2sinfo );
+        ssq_info_free( _a2sinfo );
 
-        uint8_t player_count = 0;
-        A2S_PLAYER *players = ssq_player( server, &player_count );
-        if ( ssq_server_eok( server ) )
+        /* A2S_PLAYER */
+        if ( _a2sinfo->players > 0 )
         {
-            cout << " [ \033[34mDONE\033[0m ]" << endl << endl;
-            print_svr_players( players, player_count );
-            ssq_player_free( players, player_count );
+            cout << endl << "Requesting Host for players...";
+
+            uint8_t player_count = 0;
+            A2S_PLAYER *players = ssq_player( server, &player_count );
+            if ( ssq_server_eok( server ) )
+            {
+                cout << " [ \033[34mDONE\033[0m ]" << endl << endl;
+                print_svr_players( players, player_count );
+                ssq_player_free( players, player_count );
+            }
+            else
+            {
+                cout << " [ \033[31mFAILED\033[0m ]" << endl;
+                cerr << ssq_server_emsg( server ) << endl;
+                ssq_server_eclr( server );
+            }
         }
         else
         {
-            cout << " [ \033[31mFAILED\033[0m ]" << endl;
-            cerr << ssq_server_emsg( server ) << endl;
-            ssq_server_eclr( server );
+            cout << endl << "-----------No Players Online-----------" << endl;
         }
-    }
-    else
-    {
-        cout << endl << "-----------No Players Online-----------" << endl;
-    }
 
-    ssq_server_free( server );
-    WSACleanup();
+        ssq_server_free( server );
+        WSACleanup();
+    }
+}
+
+void CgeInterface::pullCurrentMap()
+{
+    if ( initServer() )
+    {
+        bool mapValid = ( strcmp( _a2sinfo->map, "" ) != 0 );
+
+        std::string mapName = "maps/";
+        mapName += _a2sinfo->map;
+        mapName += ".bsp";
+
+        if ( mapValid )
+            FastDL::fastdl( mapName.c_str(), false, false );
+        else
+        {
+            cerr << "fastdl -> macro (pullCurrentMap) -> Failed to pull current map from server!" << endl;
+        }
+
+        ssq_server_free( server );
+        WSACleanup();
+    }
 }

@@ -70,6 +70,11 @@ bool parse( const char* cmd, const char* args )
         FastDL::fastdl( args, false, false );
         return true;
     }
+    else if ( strcmp( cmd, "current-map" ) == 0 || strcmp( cmd, "map" ) == 0 )
+    {
+        CgeInterface::pullCurrentMap();
+        return true;
+    }
     else if ( strcmp( cmd, "view" ) == 0 )
     {
         if ( strcmp( args, "full" ) == 0 )
