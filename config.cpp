@@ -572,6 +572,23 @@ void ProfileInterface::DeleteProfile()
     if ( input2 == "y" || input2 == "yes" )
     {
         prof.erase( input );
+
+        for ( int i = selection + 1; i <= GetTotalProfiles(); i++ )
+        {
+            char index[ 12 ];
+            char index2[ 12 ];
+
+            sprintf( index, "%d", i );
+            sprintf( index2, "%d", i-1 );
+
+            prof[ index2 ] = prof[ index ];
+        }
+
+        char index3[ 12 ];
+        
+        sprintf( index3, "%d", GetTotalProfiles() );
+        prof.erase( index3 );
+
         UpdateTotalProfiles( GetTotalProfiles() - 1 );
     }
 }

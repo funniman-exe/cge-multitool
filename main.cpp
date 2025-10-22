@@ -175,10 +175,7 @@ int main( int argc, char *argv[] )
     appDataPath = new char[ MAX_PATH ];
     appPath = argv[ 0 ];
 
-    appPath.substr( 0, appPath.find_last_of( "\\" ) );
-
-    cout << argv[ 0 ] << endl;
-    cout << appPath << endl;
+    appPath = appPath.substr( 0, appPath.find_last_of( "\\" ) ) + "\\";
 
     bool resetSettings = false;
     bool resetProfiles = false;
