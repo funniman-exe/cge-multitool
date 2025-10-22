@@ -32,7 +32,7 @@ bool CgeInterface::ping()
 
     char responsebuff[ 1000 ];
     string cmd = "ping -w 2000 ";
-    cmd += ip;
+    cmd += CurrentProfile::ip;
     FILE *fp = _popen( cmd.c_str(), "r" );
     while ( fgets( responsebuff, sizeof( responsebuff ), fp ) );
 
@@ -58,12 +58,13 @@ void CgeInterface::help()
     cout << "Type \"quit\" or \"exit\" - Exit the multitool." << endl;
     cout << "Type \"info\" - Print \"cge7-193\" server information." << endl;
     cout << "Type \"fastdl <filepath (no quotes)>\" - Download requested file from fastdl." << endl << endl;
-    cout << "fastdl quick macros:" << endl;
-    cout << "   Type \"view <min/full (assumes min)>\" - Check if view render assets have changed." << endl;
-    cout << "   Type \"scrape <min/full (assumes min)>\" - Check if known maps have changed." << endl;
-    cout << "   Type \"current-map\" or \"map\" - Download the server's current map from fastdl." << endl << endl;
+    if ( CurrentProfile::game == "cge7-193" ) cout << "fastdl quick macros:" << endl;
+    if ( CurrentProfile::game == "cge7-193" ) cout << "   Type \"view <min/full (assumes min)>\" - Check if view render assets have changed." << endl;
+    if ( CurrentProfile::game == "cge7-193" ) cout << "   Type \"scrape <min/full (assumes min)>\" - Check if known maps have changed." << endl;
+    if ( CurrentProfile::game == "cge7-193" ) cout << "   Type \"current-map\" or \"map\" - Download the server's current map from fastdl." << endl << endl;
     cout << "Config options:" << endl;
-    cout << "   Type \"gamepath\" - Edit the specified path to TF2." << endl;
+    cout << "   Type \"profile <list/create/edit/delete (assumes list)>\" - Edit the file path to the current profile's game." << endl;
+    cout << "   Type \"gamepath\" - Edit the file path to the current profile's game." << endl;
     cout << "   Type \"verbose\" - Toggle Verbose mode." << endl;
 }
 
@@ -90,10 +91,10 @@ const char* CgeInterface::ParseEnvirons( A2S_ENVIRONMENT environment )
 void CgeInterface::print_svr_info( const A2S_INFO *const info )
 {
     bool sourceTVActive = ( info->stv_port != 0 );
-    cout << "----- cge7-193 Server Information -----" << endl;
+    cout << "----- " << CurrentProfile::name << " Server Information -----" << endl;
     printf( "Server Protocol    - %" PRIu8 "\n", info->protocol );
     cout << "Server Name        - \"" << info->name << "\"" << endl;
-    cout << "IP                 - " << ip << endl;
+    cout << "IP                 - " << CurrentProfile::ip << endl;
     cout << "Port               - " << info->port << endl;
     cout << "SourceTV Status    - " << ( sourceTVActive ? "Online" : "Inactive" ) << endl;
     if ( sourceTVActive ) cout << "SourceTV Port      - " << info->stv_port << endl;
@@ -142,7 +143,7 @@ bool CgeInterface::initServer()
     }
 
     /* Initialization */
-    server = ssq_server_new( ip, mainPortInt );
+    server = ssq_server_new( CurrentProfile::ip.c_str(), CurrentProfile::port );
     if ( server == NULL )
     {
         cout << " [ \033[31mFAILED\033[0m ]" << endl;

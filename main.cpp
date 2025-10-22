@@ -19,6 +19,7 @@ using json = nlohmann::json;
 #include "config.h"
 #include "globs.h"
 
+int forcedProfile = 0;
 bool shouldExit = false;
 bool shouldRestart = true;
 string gamePath;
@@ -26,17 +27,17 @@ bool verbose = false;
 
 bool quitFunc = false;
 
-const char* ip = "169.150.249.133";
-const char* mainPort = "22912";
-const char* sourceTV = "22913";
-const uint16_t mainPortInt = 22912;
-const uint16_t sourceTVInt = 22913;
+const char* defaultIp = "169.150.249.133";
+const char* defaultFastDL = "https://wavespray.dathost.net/fastdl/teamfortress2/679d9656b8573d37aa848d60/";
+const uint16_t defaultMainPortInt = 22912;
+const uint16_t defaultSourceTVInt = 22913;
 
 const int verMajor = 0;
 const int verMinor = 5;
 
 char* appDataPath;
 const char* configFile = "prefs.json";
+const char* profFile = "profiles.json";
 
 bool parse( const char* cmd, const char* args )
 {
@@ -101,14 +102,29 @@ bool parse( const char* cmd, const char* args )
     {
         while( !filesystem::is_directory( gamePath ) )
         {
-            cout << "Please input a valid path to your TF2 Install folder (without quotes)" << endl << ">> ";
+            cout << "Please input a valid path to your " << CurrentProfile::game << " Install folder (without quotes)" << endl << ">> ";
 
             gamePath.clear();
 
             getline( cin, gamePath );
         }
 
-        ConfigInterface::UpdateConfStr( "gamepath", gamePath );
+        ConfigInterface::UpdateConfStr( CurrentProfile::game, gamePath );
+            
+        return true;
+    }
+    else if ( strcmp( cmd, "profile" ) == 0 )
+    {
+        if ( strcmp( args, "create" ) == 0 )
+            ProfileInterface::CreateProfile();
+        else if ( strcmp( args, "edit" ) == 0 )
+            ProfileInterface::EditProfile();
+        else if ( strcmp( args, "delete" ) == 0 )
+            ProfileInterface::DeleteProfile();
+        else if ( strcmp( args, "" ) == 0 || strcmp( args, " " ) == 0 || strcmp( args, "list" ) == 0 )
+            ProfileInterface::ListProfiles();
+        else
+            cerr << "profile -> Invalid Syntax!" << endl;
             
         return true;
     }
@@ -127,6 +143,7 @@ bool parse( const char* cmd, const char* args )
 
 void multitool()
 {
+//    cout << "The current configuration is \"" << currentConfig << "\"" << endl;
     cout << "Type \"help\" for a list of valid commands." << endl;
 
     while( !shouldExit && !shouldRestart )
@@ -155,11 +172,88 @@ void multitool()
 
 int main( int argc, char *argv[] )
 {
-    appDataPath = new char[MAX_PATH];
+    appDataPath = new char[ MAX_PATH ];
+    appPath = argv[ 0 ];
+
+    appPath.substr( 0, appPath.find_last_of( "\\" ) );
+
+    cout << argv[ 0 ] << endl;
+    cout << appPath << endl;
+
+    bool resetSettings = false;
+    bool resetProfiles = false;
+
+    for ( int i = 1; i < argc; i++ )
+    {
+        if ( ( strcmp( argv[ i ], "-rs" ) == 0 ) || ( strcmp( argv[ i ], "--reset-settings" ) == 0 ) )
+            resetSettings = true;
+
+        if ( ( strcmp( argv[ i ], "-rp" ) == 0 ) || ( strcmp( argv[ i ], "--reset-profiles" ) == 0 ) )
+            resetProfiles = true;
+    }
 
     while ( shouldRestart )
     {
         shouldRestart = false;
+
+        cout << "Registering Profiles...";
+
+        if ( !ProfileInterface::Init( resetProfiles ) )
+        {
+            cout << " [ \033[31mFAILED\033[0m ]" << endl;
+            cout << "Profile configuration file could not be found! A new one has been generated." << endl;
+            ProfileInterface::LoadProfile( 1 );
+        }
+        else
+        {
+            cout << " [ \033[34mDONE\033[0m ] " << endl;
+
+            if ( forcedProfile )
+            {
+                ProfileInterface::LoadProfile( forcedProfile );
+                forcedProfile = 0;
+            }
+            else if ( ProfileInterface::GetTotalProfiles() <= 1 )
+                ProfileInterface::LoadProfile( 1 );
+            else
+            {
+                bool invalidSelection = true;
+
+                cout << "Select a Profile" << endl << endl;
+                while ( invalidSelection )
+                {
+                    for ( int i = 1; i <= ProfileInterface::GetTotalProfiles(); i++ )
+                    {
+                        cout << "[" << i << "] " << ProfileInterface::GetConfStrNested( i, "profileName" );
+            
+                        if ( ProfileInterface::GetConfStrNested( i, "profileSeries" ) != "" && ProfileInterface::GetConfStrNested( i, "profileSeries" ) != " " )
+                            cout << " (" << ProfileInterface::GetConfStrNested( i, "profileSeries" ) << ")";
+
+                        cout << endl;
+                    }
+
+                    cout << endl << ">> ";
+
+                    string inputstream = "temp";
+                    inputstream.clear();
+
+                    getline( cin, inputstream );
+
+                    int selection = atoi( inputstream.c_str() );
+
+                    if ( selection > 0 && selection <= ProfileInterface::GetTotalProfiles() )
+                    {
+                        ProfileInterface::LoadProfile( selection );
+                        invalidSelection = false;
+                    }
+                    else
+                    {
+                        cerr << "\033[31mInvalid selection!\033[0m Please only enter a number from 1 to " << ProfileInterface::GetTotalProfiles() << "." << endl;
+                        system( "cls" );
+                    }
+                }
+            }
+        }
 
         cout << "Registering Filepath...";
 
@@ -170,24 +264,24 @@ int main( int argc, char *argv[] )
 
         delete tmp;
 
-        if ( !ConfigInterface::Init() )
+        if ( !ConfigInterface::Init( resetSettings ) )
         {
             cout << " [ \033[31mFAILED\033[0m ]" << endl;
 
             while( !filesystem::is_directory( gamePath ) )
             {
-                cout << "Please input a valid path to your TF2 Install folder (without quotes)" << endl << ">> ";
+                cout << "Please input a valid path to your " << CurrentProfile::game << " Install folder (without quotes)" << endl << ">> ";
 
                 gamePath.clear();
 
                 getline( cin, gamePath );
             }
 
-            ConfigInterface::UpdateConfStr( "gamepath", gamePath );
+            ConfigInterface::UpdateConfStr( CurrentProfile::game, gamePath );
         }
         else
         {
-            gamePath = ConfigInterface::GetConfStr( "gamepath" );
+            gamePath = ConfigInterface::GetConfStr( CurrentProfile::game );
 
             //cout << gamePath << endl;
 
@@ -197,12 +291,14 @@ int main( int argc, char *argv[] )
 
                 while( !filesystem::is_directory( gamePath ) )
                 {
-                    cout << "Please input a valid path to your TF2 Install folder (without quotes)" << endl << ">> ";
+                    cout << "Please input a valid path to your " << CurrentProfile::game << " Install folder (without quotes)" << endl << ">> ";
 
                     gamePath.clear();
 
                     getline( cin, gamePath );
                 }
+
+                ConfigInterface::UpdateConfStr( CurrentProfile::game, gamePath );
             }
             else
             {
@@ -215,10 +311,12 @@ int main( int argc, char *argv[] )
         cout << "Starting multitool..." << endl;
         //_sleep( 500 );
 
-        system("cls");
+        system( "cls" );
         cout << "Welcome to the \"cge7-193\" Multitool! v" << verMajor << "." << verMinor << endl << "   (c) 2025 funniman.exe" << endl << endl;
 
         multitool();
+
+        if ( shouldRestart ) system( "cls" );
     }
 
     cout << "\033[0m";

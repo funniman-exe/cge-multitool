@@ -33,12 +33,14 @@ void FastDL::fastdl( const char* args, bool isTempFile, bool noVerbose )
 
     char responsebuff[128];
     char* cmdHead = new char[512];
-    if ( !verbose ) strcpy( cmdHead, "curl -s -I https://wavespray.dathost.net/fastdl/teamfortress2/679d9656b8573d37aa848d60/" );
-    if ( verbose ) strcpy( cmdHead, "curl -I https://wavespray.dathost.net/fastdl/teamfortress2/679d9656b8573d37aa848d60/" );
+    if ( !verbose ) strcpy( cmdHead, "curl -s -I " );
+    if ( verbose ) strcpy( cmdHead, "curl -I " );
+    strcat( cmdHead, CurrentProfile::fastDL.c_str() );
     strcat( cmdHead, args );
     char* cmdMain = new char[512];
-    if ( !verbose ) strcpy( cmdMain, "curl -s https://wavespray.dathost.net/fastdl/teamfortress2/679d9656b8573d37aa848d60/" );
-    if ( verbose ) strcpy( cmdMain, "curl https://wavespray.dathost.net/fastdl/teamfortress2/679d9656b8573d37aa848d60/" );
+    if ( !verbose ) strcpy( cmdMain, "curl -s " );
+    if ( verbose ) strcpy( cmdMain, "curl " );
+    strcat( cmdMain, CurrentProfile::fastDL.c_str() );
     strcat( cmdMain, args );
     strcat( cmdMain, " --create-dirs --output \"" );
     strcat( cmdMain, gamePath.c_str() );

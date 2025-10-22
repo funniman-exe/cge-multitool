@@ -1,12 +1,15 @@
 # The cge7-193 Multitool
-The cge7-193 Multitool is a tool created by funniman.exe to attempt to provide a user friendly interface for accessing information related to the cge7-193 Team Fortress 2 server.
+The cge7-193 Multitool is a tool created by funniman.exe to attempt to provide a user friendly interface for accessing information related to servers running on the Source Engine.
+<br>
+This tool was originally designed for use with the INTERLOPER ARG's "cge7-193" TF2 server (hence the multitool's name), but has since been expanded to support adding custom profiles with your own servers.
 
 ## Features
 ### Current features
-- User friendly Fastdl access
-- Scraping known Fastdl files for changes
-- TF2 Server information
-- TF2 Server status
+- Custom Profiles
+- User friendly FastDL access
+- Scraping known FastDL files for changes
+- Server information
+- Server status
 - Configuration via `prefs.json`
 
 ### Upcoming features
