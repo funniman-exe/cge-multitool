@@ -566,9 +566,10 @@ void ProfileInterface::DeleteProfile()
 
     cout << endl << "Are you sure you want to continue? This action cannot be undone. (y/n)" << endl << ">> ";
 
-    getline( cin, input );
+    string input2;
+    getline( cin, input2 );
 
-    if ( input == "y" || input == "yes" )
+    if ( input2 == "y" || input2 == "yes" )
     {
         prof.erase( input );
         UpdateTotalProfiles( GetTotalProfiles() - 1 );
