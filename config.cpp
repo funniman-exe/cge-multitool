@@ -86,7 +86,10 @@ bool ConfigInterface::Init( bool resetSettings )
         if ( CurrentProfile::game == "Team Fortress 2" )
         {
             if ( ( conf[ CurrentProfile::game ].is_null() || conf[ CurrentProfile::game ] == "TMP" ) && GetConfStr( "gamepath" ) != "" )
+            {
                 conf[ CurrentProfile::game ] = GetConfStr( "gamepath" );
+                conf.erase( "gamepath" );
+            }
             else if ( conf[ CurrentProfile::game ].is_null() )
                 conf[ CurrentProfile::game ] = "TMP";
         }

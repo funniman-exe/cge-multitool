@@ -32,8 +32,8 @@ const char* defaultFastDL = "https://wavespray.dathost.net/fastdl/teamfortress2/
 const uint16_t defaultMainPortInt = 22912;
 const uint16_t defaultSourceTVInt = 22913;
 
-const int verMajor = 0;
-const int verMinor = 5;
+const int verMajor = 1;
+const int verMinor = 0;
 
 char* appDataPath;
 const char* configFile = "prefs.json";
@@ -309,7 +309,9 @@ int main( int argc, char *argv[] )
         //_sleep( 500 );
 
         system( "cls" );
-        cout << "Welcome to the \"cge7-193\" Multitool! v" << verMajor << "." << verMinor << endl << "   (c) 2025 funniman.exe" << endl << endl;
+        cout << "Welcome to the \"cge7-193\" Multitool! v" << verMajor << "." << verMinor << endl;
+        cout << "DEDICATED TO INTERLOPER -- OCTOBER 24TH 2025" << endl;
+        cout << "   (c) 2025 funniman.exe" << endl << endl;
 
         multitool();
 
