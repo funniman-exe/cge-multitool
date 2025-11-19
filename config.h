@@ -1,7 +1,7 @@
 #include <json.hpp>
 
-#define FUNNIMAN_SOFTWARE "funniman-software"
-#define APPDATA_PATH "cge-multitool"
+//#define FUNNIMAN_SOFTWARE "funniman-software"
+//#define APPDATA_PATH "cge-multitool"
 extern std::string appPath;
 //extern int totalProfiles;
 

@@ -39,7 +39,11 @@ set_target_properties(cge-multitool PROPERTIES
     OUTPUT_NAME "cge-multitool${plat_suffix}${plat_bits}${build_suffix}"
 )
 
-target_link_libraries(cge-multitool ${CMAKE_SOURCE_DIR}/thirdparty/libssq/build/libssq.a ws2_32)
+if(WIN32)
+  target_link_libraries(cge-multitool ${CMAKE_SOURCE_DIR}/thirdparty/libssq/build/libssq.a ws2_32)
+else()
+  target_link_libraries(cge-multitool ${CMAKE_SOURCE_DIR}/thirdparty/libssq/build/libssq.a)
+endif()
 
 target_include_directories(cge-multitool PRIVATE thirdparty)
 target_include_directories(cge-multitool PRIVATE thirdparty/libssq/include)

@@ -1,13 +1,18 @@
 #include <stdio.h>
 #include <iostream>
 #include <stdlib.h>
-#include <direct.h>
 #include <string>
-#include <windows.h>
+
+#ifdef _WIN32
+    #include <direct.h>
+    #include <windows.h>
+#endif /* _WIN32 */
+
 #include <fstream>
 #include <filesystem>
 #include <picosha2.h>
 #include <json.hpp>
+#include <unistd.h>
 
 using namespace std;
 
@@ -56,7 +61,7 @@ void FastDL::fastdl( const char* args, bool isTempFile, bool noVerbose )
     if ( !noVerbose ) cout << "Validating HTTP Request Header...";
     if ( verbose && !noVerbose ) cout << endl;
 
-    FILE *fp = _popen( cmdHead, "r" );
+    FILE *fp = popen( cmdHead, "r" );
     string result;
 
     if ( fgets( responsebuff, sizeof(responsebuff), fp ) != nullptr )
@@ -65,25 +70,37 @@ void FastDL::fastdl( const char* args, bool isTempFile, bool noVerbose )
         result.erase( result.find_last_not_of( " \n\r\t" ) + 1 );
     }
 
-    _pclose( fp );
+    pclose( fp );
     delete[] cmdHead;
 
-    if ( strstr( result.c_str(), "200 OK" ) == NULL )
+    if ( strstr( result.c_str(), "200" ) == NULL )
     {
         if ( !verbose && !noVerbose ) cout << " [ \033[31mFAILED\033[0m ]" << endl;
         cerr << "Invalid Request! ";
 
-        if ( strstr( result.c_str(), "404 NOT FOUND" ) != NULL )
+        if ( strstr( result.c_str(), "404" ) != NULL )
         {
             cerr << "Returned 404 on requested path \"" << args << "\". Check your spelling and try again" << endl;
         }
-        else if ( strstr( result.c_str(), "403 FORBIDDEN" ) != NULL )
+        else if ( strstr( result.c_str(), "403" ) != NULL )
         {
             cerr << "Returned 403 on requested path \"" << args << "\". Ensure you specified an actual file, not a folder" << endl;
         }
         else if ( strstr( result.c_str(), "429" ) != NULL )
         {
             cerr << "You are being Rate Limited by the host! Please wait a minute or so before continuing" << endl;
+        }
+        else if ( strstr( result.c_str(), "400" ) != NULL  )
+        {
+            cerr << "Returned 400 on requested path \"" << args << "\". This path may be malformed, or the syntax is incorrect" << endl;
+        }
+        else if ( strstr( result.c_str(), "301" ) != NULL  )
+        {
+            cerr << "Returned 301 on requested path \"" << args << "\". This tool does not as of yet support HTTP Redirects. Please contact funniman.exe" << endl;
+        }
+        else if ( strstr( result.c_str(), "302" ) != NULL  )
+        {
+            cerr << "Returned 302 on requested path \"" << args << "\". This tool does not as of yet support HTTP Redirects. Please contact funniman.exe" << endl;
         }
         else if ( strstr( result.c_str(), "Could not resolve host" ) != NULL )
         {
@@ -116,7 +133,8 @@ void FastDL::fastdl_loop( const char* jsonFile )
     //cout << "Type 'q' to exit the loop" << endl;
     cout << "To exit the loop, you must quit the application" << endl;
 
-    string targetPath = appDataPath;
+ //   string targetPath = appDataPath;
+    string targetPath = appPath;
     targetPath += jsonFile;
 
     string cmd = "curl -s https://raw.githubusercontent.com/funniman-exe/funniman-exe.github.io/refs/heads/main/ftp/interloper/";
@@ -131,7 +149,7 @@ void FastDL::fastdl_loop( const char* jsonFile )
     {
         cout << "Validating HTTP Request Header...";
 
-        FILE *fp = _popen( cmdHead.c_str(), "r" );
+        FILE *fp = popen( cmdHead.c_str(), "r" );
         string result;
 
         char responsebuff[128];
@@ -142,28 +160,40 @@ void FastDL::fastdl_loop( const char* jsonFile )
             result.erase( result.find_last_not_of( " \n\r\t" ) + 1 );
         }
 
-        _pclose( fp );
+        pclose( fp );
 
-        if ( strstr( result.c_str(), "200 OK" ) == NULL )
+        if ( strstr( result.c_str(), "200" ) == NULL )
         {
             cout << " [ \033[31mFAILED\033[0m ]" << endl;
             cerr << "Invalid Request! ";
 
-            if ( strstr( result.c_str(), "404 NOT FOUND" ) != NULL )
+            if ( strstr( result.c_str(), "404" ) != NULL )
             {
                 cerr << "Returned 404 on requested json \"" << jsonFile << "\". Please contact funniman.exe" << endl;
             }
-            else if ( strstr( result.c_str(), "403 FORBIDDEN" ) != NULL )
+            else if ( strstr( result.c_str(), "403" ) != NULL  )
             {
                 cerr << "Returned 403 on requested json \"" << jsonFile << "\". Please contact funniman.exe" << endl;
             }
-            else if ( strstr( result.c_str(), "429" ) != NULL )
+            else if ( strstr( result.c_str(), "429" ) != NULL  )
             {
                 cerr << "You are being Rate Limited by the host! Please wait a minute or so before continuing" << endl;
             }
-            else if ( strstr( result.c_str(), "Could not resolve host" ) != NULL )
+            else if ( strstr( result.c_str(), "400" ) != NULL  )
             {
-                cerr << "Could not resolve the host! Check your internet and try again." << endl << "If the issue persists, contact @funniman.exe" << endl;
+                cerr << "Returned 400 on requested json \"" << jsonFile << "\". Please contact funniman.exe" << endl;
+            }
+            else if ( strstr( result.c_str(), "301" ) != NULL  )
+            {
+                cerr << "Returned 301 on requested json \"" << jsonFile << "\". This tool does not as of yet support HTTP Redirects. Please contact funniman.exe" << endl;
+            }
+            else if ( strstr( result.c_str(), "302" ) != NULL  )
+            {
+                cerr << "Returned 302 on requested json \"" << jsonFile << "\". This tool does not as of yet support HTTP Redirects. Please contact funniman.exe" << endl;
+            }
+            else if ( strstr( result.c_str(), "Could not resolve host" ) != NULL  )
+            {
+                cerr << "Could not resolve the host! Check your internet and try again." << endl << "If the issue persists, contact funniman.exe" << endl;
             }
             else
             {
@@ -187,12 +217,13 @@ void FastDL::fastdl_loop( const char* jsonFile )
         {
             string viewFileEntry = "asset_";
 
-            char tm_a[5];
-            itoa( i + 1, tm_a, 10 );
+//            char tm_a[5];
+//            itoa( i + 1, tm_a, 10 );
 
             //cout << tm_a << endl;
 
-            viewFileEntry += tm_a;
+//            viewFileEntry += tm_a;
+            viewFileEntry += to_string( i + 1 );
 
             //cout << viewFileEntry << endl;
 
@@ -244,7 +275,7 @@ void FastDL::fastdl_loop( const char* jsonFile )
                         remove( tmp.c_str() );
                         remove( tmp2.c_str() );
                         fastdl( viewFile.c_str(), false, true );
-                        _sleep( 3000 );
+                        sleep( 3000 );
                     }
                 }
                 else

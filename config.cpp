@@ -1,10 +1,14 @@
 #include <stdio.h>
 #include <iostream>
 #include <stdlib.h>
-#include <direct.h>
 #include <string>
-#include <winsock2.h>
-#include <windows.h>
+
+#ifdef _WIN32
+    #include <direct.h>
+    #include <winsock2.h>
+    #include <windows.h>
+#endif /* _WIN32 */
+
 #include <fstream>
 #include <cinttypes>
 #include <filesystem>
@@ -39,18 +43,20 @@ namespace CurrentProfile
 
 bool ConfigInterface::Init( bool resetSettings )
 {
-    strcat( appDataPath, "\\" FUNNIMAN_SOFTWARE "\\" );
+ //   strcat( appDataPath, "\\" FUNNIMAN_SOFTWARE "\\" );
 
-    string tmp = appDataPath;
+ //   string tmp = appDataPath;
 
-    if ( !filesystem::exists( tmp ) )
-        filesystem::create_directory( tmp );
+ //   if ( !filesystem::exists( tmp ) )
+ //       filesystem::create_directory( tmp );
 
-    strcat( appDataPath, APPDATA_PATH "\\" );
-    tmp += APPDATA_PATH "\\";
+ //   strcat( appDataPath, APPDATA_PATH "\\" );
+ //   tmp += APPDATA_PATH "\\";
 
-    if ( !filesystem::exists( tmp ) )
-        filesystem::create_directory( tmp );
+ //   if ( !filesystem::exists( tmp ) )
+ //       filesystem::create_directory( tmp );
+
+    string tmp = appPath;
 
     tmp += configFile;
 
@@ -124,7 +130,8 @@ string ConfigInterface::GetConfStr( string name )
 
 void ConfigInterface::UpdateConfInt( string name, int val )
 {
-    string tmp = appDataPath;
+ //   string tmp = appDataPath;
+    string tmp = appPath;
     tmp += configFile;
 
     ofstream out( tmp );
@@ -134,7 +141,8 @@ void ConfigInterface::UpdateConfInt( string name, int val )
 
 void ConfigInterface::UpdateConfBool( string name, bool val )
 {
-    string tmp = appDataPath;
+//    string tmp = appDataPath;
+    string tmp = appPath;
     tmp += configFile;
 
     ofstream out( tmp );
@@ -144,7 +152,8 @@ void ConfigInterface::UpdateConfBool( string name, bool val )
 
 void ConfigInterface::UpdateConfStr( string name, string val )
 {
-    string tmp = appDataPath;
+//    string tmp = appDataPath;
+    string tmp = appPath;
     tmp += configFile;
 
     ofstream out( tmp );
@@ -201,7 +210,7 @@ bool ProfileInterface::Init( bool resetSettings )
 
 void ProfileInterface::CreateProfile()
 {
-    system( "cls" );
+    clrScr();
     cout << "Please enter a name for this profile (ex: cge7-193)" << endl << ">> ";
 
     string tmpName;
@@ -231,7 +240,7 @@ void ProfileInterface::CreateProfile()
 
         if ( tmpName == "" || tmpName == " " )
         {
-            system( "cls" );
+            clrScr();
             cerr << "Profile name cannot be NULL. Please enter a proper profile name" << endl << ">> ";
             illegal = true;
         }
@@ -240,7 +249,7 @@ void ProfileInterface::CreateProfile()
         {
             if ( GetConfStrNested( i, "profileName" ) == tmpName )
             {
-                system( "cls" );
+                clrScr();
                 cerr << "A profile with that name already exists! Please enter a unique profile name" << endl << ">> ";
                 illegal = true;
             }
@@ -263,7 +272,7 @@ void ProfileInterface::CreateProfile()
 
         if ( tmpGame == "" || tmpGame == " " )
         {
-            system( "cls" );
+            clrScr();
             cerr << "Game name cannot be NULL. Please enter a proper game name" << endl << ">> ";
             illegal = true;
         }
@@ -273,7 +282,7 @@ void ProfileInterface::CreateProfile()
     {
         while( !filesystem::is_directory( tmpGamePath ) )
         {
-            system( "cls" );
+            clrScr();
             cout << "Please input a valid path to your " << tmpGame << " Install folder (without quotes)" << endl << ">> ";
 
             tmpGamePath.clear();
@@ -296,7 +305,7 @@ void ProfileInterface::CreateProfile()
 
         if ( tmpIP == "" || tmpIP == " " )
         {
-            system( "cls" );
+            clrScr();
             cerr << "Server IP address cannot be NULL. Please enter a proper IP address" << endl << ">> ";
             illegal = true;
         }
@@ -314,7 +323,7 @@ void ProfileInterface::CreateProfile()
 
         if ( tmpPort == "" || tmpPort == " " )
         {
-            system( "cls" );
+            clrScr();
             cerr << "Server Port cannot be NULL. Please enter a proper Port" << endl << ">> ";
             illegal = true;
         }
@@ -345,7 +354,7 @@ void ProfileInterface::CreateProfile()
 
 void ProfileInterface::EditProfile()
 {
-    system( "cls" );
+    clrScr();
 
     bool illegal = true;
 
@@ -392,7 +401,7 @@ void ProfileInterface::EditProfile()
             illegal = false;
         else
         {
-            system( "cls" );
+            clrScr();
             cerr << "\033[31mInvalid selection!\033[0m Please only enter a number from 1 to " << ProfileInterface::GetTotalProfiles() << "." << endl;
         }
     }
@@ -409,7 +418,7 @@ void ProfileInterface::EditProfile()
 
         if ( tmpName == "" || tmpName == " " )
         {
-            system( "cls" );
+            clrScr();
             cerr << "Profile name cannot be NULL. Please enter a proper profile name" << endl << ">> ";
             illegal = true;
         }
@@ -442,7 +451,7 @@ void ProfileInterface::EditProfile()
 
         if ( tmpGame == "" || tmpGame == " " )
         {
-            system( "cls" );
+            clrScr();
             cerr << "Game name cannot be NULL. Please enter a proper game name" << endl << ">> ";
             illegal = true;
         }
@@ -476,7 +485,7 @@ void ProfileInterface::EditProfile()
 
         if ( tmpIP == "" || tmpIP == " " )
         {
-            system( "cls" );
+            clrScr();
             cerr << "Server IP address cannot be NULL. Please enter a proper IP address" << endl << ">> ";
             illegal = true;
         }
@@ -496,7 +505,7 @@ void ProfileInterface::EditProfile()
 
         if ( tmpPort == "" || tmpPort == " " )
         {
-            system( "cls" );
+            clrScr();
             cerr << "Server Port cannot be NULL. Please enter a proper Port" << endl << ">> ";
             illegal = true;
         }
@@ -555,14 +564,14 @@ void ProfileInterface::DeleteProfile()
 
         if ( selection == CurrentProfile::id )
         {
-            system( "cls" );
+            clrScr();
             cerr << "\033[31mInvalid selection!\033[0m You cannot delete the current profile" << endl << "Please select a valid profile to delete" << endl << endl;
         }
         else if ( selection > 0 && selection <= ProfileInterface::GetTotalProfiles() )
             illegal = false;
         else
         {
-            system( "cls" );
+            clrScr();
             cerr << "\033[31mInvalid selection!\033[0m Please only enter a number from 1 to " << ProfileInterface::GetTotalProfiles() << "." << endl;
         }
     }

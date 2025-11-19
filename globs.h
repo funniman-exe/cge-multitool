@@ -16,7 +16,9 @@ extern const uint16_t defaultSourceTVInt;
 extern const int verMajor;
 extern const int verMinor;
 
-extern char* appDataPath;
+//extern char* appDataPath;
 
 extern const char* configFile;
 extern const char* profFile;
+
+extern void clrScr();

@@ -2,8 +2,12 @@
 #include <iostream>
 #include <stdlib.h>
 #include <string>
-#include <winsock2.h>
-#include <windows.h>
+
+#ifdef _WIN32
+    #include <winsock2.h>
+    #include <windows.h>
+#endif /* _WIN32 */
+
 #include <fstream>
 #include <cinttypes>
 #include <filesystem>
@@ -21,7 +25,10 @@ using json = nlohmann::json;
 
 namespace CgeInterface
 {
+#ifdef _WIN32
     WSADATA wsa_data;
+#endif /* _WIN32 */
+
     SSQ_SERVER* server = nullptr;
     A2S_INFO* _a2sinfo = nullptr;
 }
@@ -31,12 +38,12 @@ bool CgeInterface::ping()
     cout << "Pinging host...";
 
     char responsebuff[ 1000 ];
-    string cmd = "ping -w 2000 ";
+    string cmd = "ping -w 2000 -c 2 ";
     cmd += CurrentProfile::ip;
-    FILE *fp = _popen( cmd.c_str(), "r" );
+    FILE *fp = popen( cmd.c_str(), "r" );
     while ( fgets( responsebuff, sizeof( responsebuff ), fp ) );
 
-    int stat = _pclose( fp );
+    int stat = pclose( fp );
 
     if ( stat == 1 )
     {
@@ -57,11 +64,15 @@ void CgeInterface::help()
     cout << "Type \"reset\" or \"restart\" - Restart the multitool." << endl;
     cout << "Type \"quit\" or \"exit\" - Exit the multitool." << endl;
     cout << "Type \"info\" - Print \"cge7-193\" server information." << endl;
-    cout << "Type \"fastdl <filepath (no quotes)>\" - Download requested file from fastdl." << endl << endl;
-    if ( CurrentProfile::game == "cge7-193" ) cout << "fastdl quick macros:" << endl;
-    if ( CurrentProfile::game == "cge7-193" ) cout << "   Type \"view <min/full (assumes min)>\" - Check if view render assets have changed." << endl;
-    if ( CurrentProfile::game == "cge7-193" ) cout << "   Type \"scrape <min/full (assumes min)>\" - Check if known maps have changed." << endl;
-    if ( CurrentProfile::game == "cge7-193" ) cout << "   Type \"current-map\" or \"map\" - Download the server's current map from fastdl." << endl << endl;
+
+    if ( CurrentProfile::fastDL != "" ) cout << "Type \"fastdl <filepath (no quotes)>\" - Download requested file from fastdl." << endl;
+    cout << endl;
+
+    if ( CurrentProfile::fastDL != "" ) cout << "fastdl quick macros:" << endl;
+    if ( CurrentProfile::name == "cge7-193" && CurrentProfile::fastDL != "" ) cout << "   Type \"view <min/full (assumes min)>\" - Check if view render assets have changed." << endl;
+    if ( CurrentProfile::name == "cge7-193" && CurrentProfile::fastDL != "" ) cout << "   Type \"scrape <min/full (assumes min)>\" - Check if known maps have changed." << endl;
+    if ( CurrentProfile::fastDL != "" ) cout << "   Type \"current-map\" or \"map\" - Download the server's current map from fastdl." << endl << endl;
+
     cout << "Config options:" << endl;
     cout << "   Type \"profile <list/create/edit/delete (assumes list)>\" - Edit the file path to the current profile's game." << endl;
     cout << "   Type \"gamepath\" - Edit the file path to the current profile's game." << endl;
@@ -135,12 +146,14 @@ bool CgeInterface::initServer()
 
     cout << "Establishing connection to host...";
 
+#ifdef _WIN32
     if ( WSAStartup( MAKEWORD( 2, 2 ), &wsa_data ) != NO_ERROR )
     {
         cout << " [ \033[31mFAILED\033[0m ]" << endl;
         cerr << "WSAStartup failed with code " << WSAGetLastError() << endl;
         return false;
     }
+#endif /* _WIN32 */
 
     /* Initialization */
     server = ssq_server_new( CurrentProfile::ip.c_str(), CurrentProfile::port );
@@ -148,7 +161,11 @@ bool CgeInterface::initServer()
     {
         cout << " [ \033[31mFAILED\033[0m ]" << endl;
         cerr << "Memory Exhausted" << endl;
+
+#ifdef _WIN32
         WSACleanup();
+#endif /* _WIN32 */
+
         return false;
     }
     else if ( !ssq_server_eok( server ) )
@@ -156,7 +173,11 @@ bool CgeInterface::initServer()
         cerr << ssq_server_emsg( server ) << endl;
         ssq_server_eclr( server );
         ssq_server_free( server );
+
+#ifdef _WIN32
         WSACleanup();
+#endif /* _WIN32 */
+
         return false;
     }
     ssq_server_timeout( server, ( SSQ_TIMEOUT_SELECTOR )( SSQ_TIMEOUT_RECV | SSQ_TIMEOUT_SEND ), 10000 );
@@ -178,7 +199,11 @@ bool CgeInterface::initServer()
         cerr << "ssq_info: " << ssq_server_emsg( server ) << endl;
         ssq_server_eclr( server );
         ssq_server_free( server );
+
+#ifdef _WIN32
         WSACleanup();
+#endif /* _WIN32 */
+
         return false;
     }
 }
@@ -219,7 +244,10 @@ void CgeInterface::info()
         }
 
         ssq_server_free( server );
+
+#ifdef _WIN32
         WSACleanup();
+#endif /* _WIN32 */
     }
 }
 
@@ -241,6 +269,9 @@ void CgeInterface::pullCurrentMap()
         }
 
         ssq_server_free( server );
+        
+#ifdef _WIN32
         WSACleanup();
+#endif /* _WIN32 */
     }
 }

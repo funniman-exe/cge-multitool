@@ -1,13 +1,17 @@
 #include <stdio.h>
 #include <iostream>
 #include <stdlib.h>
-#include <direct.h>
 #include <string>
-#include <winsock2.h>
-#include <windows.h>
+
+#ifdef _WIN32
+    #include <direct.h>
+    #include <winsock2.h>
+    #include <windows.h>
+    #include <shlobj.h>
+#endif /* _WIN32 */
+
 #include <fstream>
 #include <filesystem>
-#include <shlobj.h>
 #include <json.hpp>
 
 using namespace std;
@@ -33,11 +37,20 @@ const uint16_t defaultMainPortInt = 22912;
 const uint16_t defaultSourceTVInt = 22913;
 
 const int verMajor = 1;
-const int verMinor = 0;
+const int verMinor = 1;
 
-char* appDataPath;
+//char* appDataPath;
 const char* configFile = "prefs.json";
 const char* profFile = "profiles.json";
+
+void clrScr()
+{
+#ifdef _WIN32
+    clrScr();
+#else
+    system( "clear" );
+#endif /* _WIN32 */
+}
 
 bool parse( const char* cmd, const char* args )
 {
@@ -68,16 +81,40 @@ bool parse( const char* cmd, const char* args )
     }
     else if ( strcmp( cmd, "fastdl" ) == 0 )
     {
+        if ( CurrentProfile::fastDL == "" )
+        {
+            cerr << "The current profile has no fastdl set, so you cannot use this command." << endl;
+            return true;
+        }
+
         FastDL::fastdl( args, false, false );
         return true;
     }
     else if ( strcmp( cmd, "current-map" ) == 0 || strcmp( cmd, "map" ) == 0 )
     {
+        if ( CurrentProfile::fastDL == "" )
+        {
+            cerr << "The current profile has no fastdl set, so you cannot use this command." << endl;
+            return true;
+        }
+
         CgeInterface::pullCurrentMap();
         return true;
     }
     else if ( strcmp( cmd, "view" ) == 0 )
     {
+        if ( CurrentProfile::name != "cge7-193" )
+        {
+            cerr << "This command is only supported when using the \"cge7-193\" profile." << endl;
+            return true;
+        }
+
+        if ( CurrentProfile::fastDL == "" )
+        {
+            cerr << "The current profile has no fastdl set, so you cannot use this command." << endl;
+            return true;
+        }
+
         if ( strcmp( args, "full" ) == 0 )
             FastDL::fastdl_macro_view();
         else if ( strcmp( args, "" ) == 0 || strcmp( args, " " ) == 0 || strcmp( args, "min" ) == 0 )
@@ -89,6 +126,18 @@ bool parse( const char* cmd, const char* args )
     }
     else if ( strcmp( cmd, "scrape" ) == 0 )
     {
+        if ( CurrentProfile::name != "cge7-193" )
+        {
+            cerr << "This command is only supported when using the \"cge7-193\" profile." << endl;
+            return true;
+        }
+
+        if ( CurrentProfile::fastDL == "" )
+        {
+            cerr << "The current profile has no fastdl set, so you cannot use this command." << endl;
+            return true;
+        }
+
         if ( strcmp( args, "full" ) == 0 )
             FastDL::fastdl_macro_scrape();
         else if ( strcmp( args, "" ) == 0 || strcmp( args, " " ) == 0 || strcmp( args, "min" ) == 0 )
@@ -172,10 +221,14 @@ void multitool()
 
 int main( int argc, char *argv[] )
 {
-    appDataPath = new char[ MAX_PATH ];
+ //   appDataPath = new char[ MAX_PATH ];
     appPath = argv[ 0 ];
 
+#ifdef _WIN32
     appPath = appPath.substr( 0, appPath.find_last_of( "\\" ) ) + "\\";
+#else
+    appPath = appPath.substr( 0, appPath.find_last_of( "/" ) ) + "/";
+#endif /* _WIN32 */
 
     bool resetSettings = false;
     bool resetProfiles = false;
@@ -246,7 +299,7 @@ int main( int argc, char *argv[] )
                     else
                     {
                         cerr << "\033[31mInvalid selection!\033[0m Please only enter a number from 1 to " << ProfileInterface::GetTotalProfiles() << "." << endl;
-                        system( "cls" );
+                        clrScr();
                     }
                 }
             }
@@ -254,12 +307,12 @@ int main( int argc, char *argv[] )
 
         cout << "Registering Filepath...";
 
-        PWSTR *tmp = new wchar_t*;
+ //       PWSTR *tmp = new wchar_t*;
 
-        SHGetKnownFolderPath( FOLDERID_RoamingAppData, 0, NULL, tmp );
-        wcstombs( appDataPath, *tmp, sizeof( char ) * MAX_PATH );
+ //       SHGetKnownFolderPath( FOLDERID_RoamingAppData, 0, NULL, tmp );
+ //       wcstombs( appDataPath, *tmp, sizeof( char ) * MAX_PATH );
 
-        delete tmp;
+ //       delete tmp;
 
         if ( !ConfigInterface::Init( resetSettings ) )
         {
@@ -306,16 +359,16 @@ int main( int argc, char *argv[] )
         }
 
         cout << "Starting multitool..." << endl;
-        //_sleep( 500 );
+        //sleep( 500 );
 
-        system( "cls" );
+        clrScr();
         cout << "Welcome to the \"cge7-193\" Multitool! v" << verMajor << "." << verMinor << endl;
         cout << "DEDICATED TO INTERLOPER -- OCTOBER 24TH 2025" << endl;
         cout << "   (c) 2025 funniman.exe" << endl << endl;
 
         multitool();
 
-        if ( shouldRestart ) system( "cls" );
+        if ( shouldRestart ) clrScr();
     }
 
     cout << "\033[0m";
