@@ -205,9 +205,10 @@ void multitool()
         inputstream.clear();
         second.clear();
 
-        getline( cin, inputstream );
+        getline( cin >> ws, inputstream );
 
         string::size_type pos = inputstream.find( ' ', 0 );
+
         if ( pos != string::npos )
         {
             second = inputstream.substr( pos+1 );
