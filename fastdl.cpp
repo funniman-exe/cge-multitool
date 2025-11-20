@@ -38,13 +38,13 @@ void FastDL::fastdl( const char* args, bool isTempFile, bool noVerbose )
 
     char responsebuff[128];
     char* cmdHead = new char[512];
-    if ( !verbose ) strcpy( cmdHead, "curl -s -I " );
-    if ( verbose ) strcpy( cmdHead, "curl -I " );
+    if ( !verbose ) strcpy( cmdHead, "curl -s -I -L " );
+    if ( verbose ) strcpy( cmdHead, "curl -I -L " );
     strcat( cmdHead, CurrentProfile::fastDL.c_str() );
     strcat( cmdHead, args );
     char* cmdMain = new char[512];
-    if ( !verbose ) strcpy( cmdMain, "curl -s " );
-    if ( verbose ) strcpy( cmdMain, "curl " );
+    if ( !verbose ) strcpy( cmdMain, "curl -s -L " );
+    if ( verbose ) strcpy( cmdMain, "curl -L " );
     strcat( cmdMain, CurrentProfile::fastDL.c_str() );
     strcat( cmdMain, args );
     strcat( cmdMain, " --create-dirs --output \"" );
@@ -76,35 +76,43 @@ void FastDL::fastdl( const char* args, bool isTempFile, bool noVerbose )
     if ( strstr( result.c_str(), "200" ) == NULL )
     {
         if ( !verbose && !noVerbose ) cout << " [ \033[31mFAILED\033[0m ]" << endl;
-        cerr << "Invalid Request! ";
+        cerr << "Request Failed! ";
 
-        if ( strstr( result.c_str(), "404" ) != NULL )
+        if ( strstr( result.c_str(), "503" ) != NULL )
         {
-            cerr << "Returned 404 on requested path \"" << args << "\". Check your spelling and try again" << endl;
+            cerr << "503: The target webserver was unable to handle the request at this time. Please try again later." << endl;
         }
-        else if ( strstr( result.c_str(), "403" ) != NULL )
+        else if ( strstr( result.c_str(), "502" ) != NULL )
         {
-            cerr << "Returned 403 on requested path \"" << args << "\". Ensure you specified an actual file, not a folder" << endl;
+            cerr << "502: Gateway server got malformed response from upstream. Please try again later" << endl;
         }
         else if ( strstr( result.c_str(), "429" ) != NULL )
         {
-            cerr << "You are being Rate Limited by the host! Please wait a minute or so before continuing" << endl;
+            cerr << "429: You are being Rate Limited! Please wait a minute or so before continuing." << endl;
+        }
+        else if ( strstr( result.c_str(), "404" ) != NULL )
+        {
+            cerr << "404: File not found - \"" << args << "\". Check your spelling and try again." << endl;
+        }
+        else if ( strstr( result.c_str(), "403" ) != NULL )
+        {
+            cerr << "403: Unauthorized request - \"" << args << "\". Ensure you specified an actual file, not a folder." << endl;
         }
         else if ( strstr( result.c_str(), "400" ) != NULL  )
         {
-            cerr << "Returned 400 on requested path \"" << args << "\". This path may be malformed, or the syntax is incorrect" << endl;
+            cerr << "400: Illegal request - \"" << args << "\". This path may be malformed, or the syntax is incorrect." << endl;
         }
-        else if ( strstr( result.c_str(), "301" ) != NULL  )
+        /*else if ( strstr( result.c_str(), "301" ) != NULL  )
         {
-            cerr << "Returned 301 on requested path \"" << args << "\". This tool does not as of yet support HTTP Redirects. Please contact funniman.exe" << endl;
+            cerr << "301: Permanent redirect - \"" << args << "\". This tool does not as of yet support HTTP Redirects. Please contact funniman.exe" << endl;
         }
         else if ( strstr( result.c_str(), "302" ) != NULL  )
         {
-            cerr << "Returned 302 on requested path \"" << args << "\". This tool does not as of yet support HTTP Redirects. Please contact funniman.exe" << endl;
-        }
+            cerr << "302: Temporary redirect - \"" << args << "\". This tool does not as of yet support HTTP Redirects. Please contact funniman.exe" << endl;
+        }*/
         else if ( strstr( result.c_str(), "Could not resolve host" ) != NULL )
         {
-            cerr << "Could not resolve the fastdl host! Check your internet and try again." << endl << "If the issue persists, contact @funniman.exe" << endl;
+            cerr << "Failed to resolve host! Check your internet and try again." << endl << "If this issue persists, please contact funniman.exe" << endl;
         }
         else
         {
@@ -137,12 +145,12 @@ void FastDL::fastdl_loop( const char* jsonFile )
     string targetPath = appPath;
     targetPath += jsonFile;
 
-    string cmd = "curl -s https://raw.githubusercontent.com/funniman-exe/funniman-exe.github.io/refs/heads/main/ftp/interloper/";
+    string cmd = "curl -s -L https://raw.githubusercontent.com/funniman-exe/funniman-exe.github.io/refs/heads/main/ftp/interloper/";
     cmd += jsonFile;
     cmd += " --create-dirs --output ";
     cmd += targetPath;
 
-    string cmdHead = "curl -s -I https://raw.githubusercontent.com/funniman-exe/funniman-exe.github.io/refs/heads/main/ftp/interloper/";
+    string cmdHead = "curl -s -I -L https://raw.githubusercontent.com/funniman-exe/funniman-exe.github.io/refs/heads/main/ftp/interloper/";
     cmdHead += jsonFile;
 
     while ( true )
@@ -165,35 +173,43 @@ void FastDL::fastdl_loop( const char* jsonFile )
         if ( strstr( result.c_str(), "200" ) == NULL )
         {
             cout << " [ \033[31mFAILED\033[0m ]" << endl;
-            cerr << "Invalid Request! ";
+            cerr << "Request Failed! ";
 
-            if ( strstr( result.c_str(), "404" ) != NULL )
+            if ( strstr( result.c_str(), "503" ) != NULL )
             {
-                cerr << "Returned 404 on requested json \"" << jsonFile << "\". Please contact funniman.exe" << endl;
+                cerr << "503: The target webserver was unable to handle the request at this time. Please try again later." << endl;
             }
-            else if ( strstr( result.c_str(), "403" ) != NULL  )
+            else if ( strstr( result.c_str(), "502" ) != NULL )
             {
-                cerr << "Returned 403 on requested json \"" << jsonFile << "\". Please contact funniman.exe" << endl;
+                cerr << "502: Gateway server got malformed response from upstream. Please try again later" << endl;
             }
-            else if ( strstr( result.c_str(), "429" ) != NULL  )
+            else if ( strstr( result.c_str(), "429" ) != NULL )
             {
-                cerr << "You are being Rate Limited by the host! Please wait a minute or so before continuing" << endl;
+                cerr << "429: You are being Rate Limited! Please wait a minute or so before continuing." << endl;
+            }
+            else if ( strstr( result.c_str(), "404" ) != NULL )
+            {
+                cerr << "404: File not found - \"" << jsonFile << "\". Please contact funniman.exe" << endl;
+            }
+            else if ( strstr( result.c_str(), "403" ) != NULL )
+            {
+                cerr << "403: Unauthorized request - \"" << jsonFile << "\". Please contact funniman.exe" << endl;
             }
             else if ( strstr( result.c_str(), "400" ) != NULL  )
             {
-                cerr << "Returned 400 on requested json \"" << jsonFile << "\". Please contact funniman.exe" << endl;
+                cerr << "400: Illegal request - \"" << jsonFile << "\". Please contact funniman.exe" << endl;
             }
-            else if ( strstr( result.c_str(), "301" ) != NULL  )
+            /*else if ( strstr( result.c_str(), "301" ) != NULL  )
             {
-                cerr << "Returned 301 on requested json \"" << jsonFile << "\". This tool does not as of yet support HTTP Redirects. Please contact funniman.exe" << endl;
+                cerr << "301: Permanent redirect - \"" << jsonFile << "\". This tool does not as of yet support HTTP Redirects. Please contact funniman.exe" << endl;
             }
             else if ( strstr( result.c_str(), "302" ) != NULL  )
             {
-                cerr << "Returned 302 on requested json \"" << jsonFile << "\". This tool does not as of yet support HTTP Redirects. Please contact funniman.exe" << endl;
-            }
-            else if ( strstr( result.c_str(), "Could not resolve host" ) != NULL  )
+                cerr << "302: Temporary redirect - \"" << jsonFile << "\". This tool does not as of yet support HTTP Redirects. Please contact funniman.exe" << endl;
+            }*/
+            else if ( strstr( result.c_str(), "Could not resolve host" ) != NULL )
             {
-                cerr << "Could not resolve the host! Check your internet and try again." << endl << "If the issue persists, contact funniman.exe" << endl;
+                cerr << "Failed to resolve host! Check your internet and try again." << endl << "If this issue persists, please contact funniman.exe" << endl;
             }
             else
             {

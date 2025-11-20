@@ -46,7 +46,7 @@ const char* profFile = "profiles.json";
 void clrScr()
 {
 #ifdef _WIN32
-    clrScr();
+    system( "cls" );
 #else
     system( "clear" );
 #endif /* _WIN32 */
@@ -56,7 +56,7 @@ bool parse( const char* cmd, const char* args )
 {
     if ( strcmp( cmd, "cls" ) == 0 )
     {
-        system("cls");
+        clrScr();
         return true;
     }
     else if ( strcmp( cmd, "help" ) == 0 )

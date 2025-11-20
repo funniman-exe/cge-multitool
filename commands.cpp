@@ -38,14 +38,18 @@ bool CgeInterface::ping()
     cout << "Pinging host...";
 
     char responsebuff[ 1000 ];
+#ifdef _WIN32
+    string cmd = "ping -w 2000 ";
+#else
     string cmd = "ping -w 2 -c 2 ";
+#endif /* _WIN32 */
     cmd += CurrentProfile::ip;
     FILE *fp = popen( cmd.c_str(), "r" );
     while ( fgets( responsebuff, sizeof( responsebuff ), fp ) );
 
     int stat = pclose( fp );
 
-    if ( stat > 0 )
+    if ( stat != 0 )
     {
         cout << " [ \033[31mFAILED\033[0m ]" << endl;
         return false;
