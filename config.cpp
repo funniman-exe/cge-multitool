@@ -92,12 +92,12 @@ bool ConfigInterface::Init( bool resetSettings )
         if ( CurrentProfile::game == "Team Fortress 2" )
         {
             if ( ( conf[ CurrentProfile::game ].is_null() || conf[ CurrentProfile::game ] == "TMP" ) && GetConfStr( "gamepath" ) != "" )
-            {
                 conf[ CurrentProfile::game ] = GetConfStr( "gamepath" );
-                conf.erase( "gamepath" );
-            }
             else if ( conf[ CurrentProfile::game ].is_null() )
                 conf[ CurrentProfile::game ] = "TMP";
+            
+            if ( GetConfStr( "gamepath" ) != "" )
+                conf.erase( "gamepath" );
         }
 
         ofstream out( tmp );
@@ -621,6 +621,9 @@ void ProfileInterface::ListProfiles()
 
 void ProfileInterface::LoadProfile( int profileIndex )
 {
+    if ( profileIndex > GetTotalProfiles() || profileIndex < 1 )
+        profileIndex = 1;
+
     CurrentProfile::name = GetConfStrNested( profileIndex, "profileName" );
     CurrentProfile::series = GetConfStrNested( profileIndex, "profileSeries" );
     CurrentProfile::game = GetConfStrNested( profileIndex, "profileGame" );

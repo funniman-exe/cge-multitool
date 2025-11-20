@@ -246,6 +246,9 @@ int main( int argc, char *argv[] )
 
         if ( ( strcmp( argv[ i ], "-rp" ) == 0 ) || ( strcmp( argv[ i ], "--reset-profiles" ) == 0 ) )
             resetProfiles = true;
+        
+        if ( ( strcmp( argv[ i ], "-fp" ) == 0 ) || ( strcmp( argv[ i ], "--forced-profile" ) == 0 ) )
+            forcedProfile = ++i;
     }
 
     while ( shouldRestart )

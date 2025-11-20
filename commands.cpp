@@ -71,24 +71,30 @@ void CgeInterface::credits()
     cout << "   Special Thanks" << endl;
     cout << "       Anomidae" << endl;
     cout << "       Lunascape" << endl;
+    cout << "       Lucas Lopes" << endl;
 }
 
 void CgeInterface::help()
 {
     cout << "The \"cge7-193\" Multitool v" << verMajor << "." << verMinor << endl << "   (c) 2025 funniman.exe" << endl << endl;
-    cout << "Type \"help\" - Brings up this menu." << endl;
-    cout << "Type \"credits\" - Displays the credits of the cge7-193 multitool." << endl;
-    cout << "Type \"reset\" or \"restart\" - Restart the multitool." << endl;
-    cout << "Type \"quit\" or \"exit\" - Exit the multitool." << endl;
-    cout << "Type \"info\" - Print \"cge7-193\" server information." << endl;
+    cout << "Command-line arguments:" << endl;
+    cout << "   [-rs | --reset-settings] Reset settings" << endl;
+    cout << "   [-rp | --reset-profiles] Reset profiles" << endl;
+    cout << "   [-fp | --forced-profile] Skip the profile selector and launch with the specified profile number" << endl << endl;
+    cout << "Commands:" << endl;
+    cout << "   Type \"help\" - Brings up this menu." << endl;
+    cout << "   Type \"credits\" - Displays the credits of the cge7-193 multitool." << endl;
+    cout << "   Type \"reset\" or \"restart\" - Restart the multitool." << endl;
+    cout << "   Type \"quit\" or \"exit\" - Exit the multitool." << endl;
+    cout << "   Type \"info\" - Print \"cge7-193\" server information." << endl;
 
-    if ( CurrentProfile::fastDL != "" ) cout << "Type \"fastdl <filepath (no quotes)>\" - Download requested file from fastdl." << endl;
+    if ( CurrentProfile::fastDL != "" ) cout << "   Type \"fastdl <filepath (no quotes)>\" - Download requested file from fastdl." << endl;
     cout << endl;
 
-    if ( CurrentProfile::fastDL != "" ) cout << "fastdl quick macros:" << endl;
-    if ( CurrentProfile::name == "cge7-193" && CurrentProfile::fastDL != "" ) cout << "   Type \"view <min/full (assumes min)>\" - Check if view render assets have changed." << endl;
-    if ( CurrentProfile::name == "cge7-193" && CurrentProfile::fastDL != "" ) cout << "   Type \"scrape <min/full (assumes min)>\" - Check if known maps have changed." << endl;
-    if ( CurrentProfile::fastDL != "" ) cout << "   Type \"current-map\" or \"map\" - Download the server's current map from fastdl." << endl << endl;
+    if ( CurrentProfile::fastDL != "" ) cout << "   fastdl quick macros:" << endl;
+    if ( CurrentProfile::name == "cge7-193" && CurrentProfile::fastDL != "" ) cout << "      Type \"view <min/full (assumes min)>\" - Check if view render assets have changed." << endl;
+    if ( CurrentProfile::name == "cge7-193" && CurrentProfile::fastDL != "" ) cout << "      Type \"scrape <min/full (assumes min)>\" - Check if known maps have changed." << endl;
+    if ( CurrentProfile::fastDL != "" ) cout << "      Type \"current-map\" or \"map\" - Download the server's current map from fastdl." << endl << endl;
 
     cout << "Config options:" << endl;
     cout << "   Type \"profile <list/create/edit/delete (assumes list)>\" - Edit the file path to the current profile's game." << endl;
