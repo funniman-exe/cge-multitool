@@ -248,7 +248,7 @@ int main( int argc, char *argv[] )
             resetProfiles = true;
         
         if ( ( strcmp( argv[ i ], "-fp" ) == 0 ) || ( strcmp( argv[ i ], "--forced-profile" ) == 0 ) )
-            forcedProfile = ++i;
+            forcedProfile = atoi( argv[ ++i ] );
     }
 
     while ( shouldRestart )
