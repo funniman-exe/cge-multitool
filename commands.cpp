@@ -61,10 +61,23 @@ bool CgeInterface::ping()
     return true;
 }
 
+void CgeInterface::credits()
+{
+    cout << "The \"cge7-193\" Multitool is a piece of software by funniman.exe" << endl;
+    cout << "   Utilized Libraries" << endl;
+    cout << "       JSON for Modern C++ - Niels Lohmann" << endl;
+    cout << "       libssq - BinaryAlien" << endl;
+    cout << "       picosha2 - okdshin" << endl << endl;
+    cout << "   Special Thanks" << endl;
+    cout << "       Anomidae" << endl;
+    cout << "       Lunascape" << endl;
+}
+
 void CgeInterface::help()
 {
     cout << "The \"cge7-193\" Multitool v" << verMajor << "." << verMinor << endl << "   (c) 2025 funniman.exe" << endl << endl;
     cout << "Type \"help\" - Brings up this menu." << endl;
+    cout << "Type \"credits\" - Displays the credits of the cge7-193 multitool." << endl;
     cout << "Type \"reset\" or \"restart\" - Restart the multitool." << endl;
     cout << "Type \"quit\" or \"exit\" - Exit the multitool." << endl;
     cout << "Type \"info\" - Print \"cge7-193\" server information." << endl;

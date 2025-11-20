@@ -64,6 +64,11 @@ bool parse( const char* cmd, const char* args )
         CgeInterface::help();
         return true;
     }
+    else if ( strcmp( cmd, "credits" ) == 0 )
+    {
+        CgeInterface::credits();
+        return true;
+    }
     else if ( strcmp( cmd, "exit" ) == 0 || strcmp( cmd, "quit" ) == 0 )
     {
         shouldExit = true;

@@ -8,6 +8,9 @@ namespace CgeInterface
     // Ping command
     bool ping_sourcetv();
 
+    // Displays credits
+    void credits();
+
     // Help command - displays command list
     void help();
 
