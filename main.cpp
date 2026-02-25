@@ -26,8 +26,13 @@ using json = nlohmann::json;
 int forcedProfile = 0;
 bool shouldExit = false;
 bool shouldRestart = true;
+bool shouldSwitchProfiles = false;
+
 string gamePath;
+
 bool verbose = false;
+int defaultProfile = 1;
+bool useProfileSelector = true;
 
 bool quitFunc = false;
 
@@ -37,7 +42,7 @@ const uint16_t defaultMainPortInt = 22912;
 const uint16_t defaultSourceTVInt = 22913;
 
 const int verMajor = 1;
-const int verMinor = 1;
+const int verMinor = 2;
 
 //char* appDataPath;
 const char* configFile = "prefs.json";
@@ -54,145 +59,143 @@ void clrScr()
 
 bool parse( const char* cmd, const char* args )
 {
-    if ( strcmp( cmd, "cls" ) == 0 )
-    {
-        clrScr();
-        return true;
-    }
-    else if ( strcmp( cmd, "help" ) == 0 )
-    {
-        CgeInterface::help();
-        return true;
-    }
-    else if ( strcmp( cmd, "credits" ) == 0 )
-    {
-        CgeInterface::credits();
-        return true;
-    }
-    else if ( strcmp( cmd, "exit" ) == 0 || strcmp( cmd, "quit" ) == 0 )
-    {
-        shouldExit = true;
-        return true;
-    }
-    else if ( strcmp( cmd, "reset" ) == 0 || strcmp( cmd, "restart" ) == 0 )
-    {
-        shouldRestart = true;
-        return true;
-    }
-    else if ( strcmp( cmd, "info" ) == 0 )
-    {
-        CgeInterface::info();
-        return true;
-    }
-    else if ( strcmp( cmd, "fastdl" ) == 0 )
-    {
-        if ( CurrentProfile::fastDL == "" )
+	if ( strcmp( cmd, "cls" ) == 0 )
+		clrScr();
+	else if ( strcmp( cmd, "help" ) == 0 )
+		CgeInterface::help();
+	else if ( strcmp( cmd, "credits" ) == 0 )
+		CgeInterface::credits();
+	else if ( strcmp( cmd, "exit" ) == 0 || strcmp( cmd, "quit" ) == 0 )
+		shouldExit = true;
+	else if ( strcmp( cmd, "reset" ) == 0 || strcmp( cmd, "restart" ) == 0 )
+		shouldRestart = true;
+	else if ( strcmp( cmd, "info" ) == 0 )
+		CgeInterface::info();
+	else if ( strcmp( cmd, "fastdl" ) == 0 )
+	{
+		if ( CurrentProfile::fastDL == "" )
+		{
+			cerr << "The current profile has no fastdl set, so you cannot use this command." << endl;
+			return true;
+		}
+
+		FastDL::fastdl( args, false, false );
+	}
+	else if ( strcmp( cmd, "current-map" ) == 0 || strcmp( cmd, "map" ) == 0 )
+	{
+		if ( CurrentProfile::fastDL == "" )
+		{
+			cerr << "The current profile has no fastdl set, so you cannot use this command." << endl;
+			return true;
+		}
+
+		CgeInterface::pullCurrentMap();
+	}
+	else if ( strcmp( cmd, "view" ) == 0 )
+	{
+		if ( CurrentProfile::name != "cge7-193" )
+		{
+			cerr << "This command is only supported when using the \"cge7-193\" profile." << endl;
+			return true;
+		}
+
+		if ( CurrentProfile::fastDL == "" )
+		{
+			cerr << "The current profile has no fastdl set, so you cannot use this command." << endl;
+			return true;
+		}
+
+		if ( strcmp( args, "full" ) == 0 )
+			FastDL::fastdl_macro_view();
+		else if ( strcmp( args, "" ) == 0 || strcmp( args, " " ) == 0 || strcmp( args, "min" ) == 0 )
+			FastDL::fastdl_macro_view_min();
+		else
+			cerr << "fastdl -> macro (view) -> Invalid Syntax!" << endl;
+	}
+	else if ( strcmp( cmd, "scrape" ) == 0 )
+	{
+		if ( CurrentProfile::name != "cge7-193" )
+		{
+			cerr << "This command is only supported when using the \"cge7-193\" profile." << endl;
+			return true;
+		}
+
+		if ( CurrentProfile::fastDL == "" )
+		{
+			cerr << "The current profile has no fastdl set, so you cannot use this command." << endl;
+			return true;
+		}
+
+		if ( strcmp( args, "full" ) == 0 )
+			FastDL::fastdl_macro_scrape();
+		else if ( strcmp( args, "" ) == 0 || strcmp( args, " " ) == 0 || strcmp( args, "min" ) == 0 )
+			FastDL::fastdl_macro_scrape_min();
+		else
+			cerr << "fastdl -> macro (scrape) -> Invalid Syntax!" << endl;
+	}
+	else if ( strcmp( cmd, "gamepath" ) == 0 )
+	{
+		while( !filesystem::is_directory( gamePath ) )
+		{
+			cout << "Please input a valid path to your " << CurrentProfile::game << " Install folder (without quotes)" << endl << ">> ";
+
+			gamePath.clear();
+
+			getline( cin, gamePath );
+		}
+
+		ConfigInterface::UpdateConfStr( CurrentProfile::game, gamePath );
+	}
+	else if ( strcmp( cmd, "profile" ) == 0 )
+	{
+		if ( strcmp( args, "create" ) == 0 )
+			ProfileInterface::CreateProfile();
+		else if ( strcmp( args, "edit" ) == 0 )
+			ProfileInterface::EditProfile();
+		else if ( strcmp( args, "delete" ) == 0 )
+			ProfileInterface::DeleteProfile();
+        else if ( strcmp( args, "switch" ) == 0 )
         {
-            cerr << "The current profile has no fastdl set, so you cannot use this command." << endl;
-            return true;
+            if ( ProfileInterface::GetTotalProfiles() <= 1 )
+            {
+                cout << "You need multiple profiles to launch the profile selector." << endl;
+                return true;
+            }
+
+            shouldRestart = true;
+            shouldSwitchProfiles = true;
         }
-
-        FastDL::fastdl( args, false, false );
-        return true;
-    }
-    else if ( strcmp( cmd, "current-map" ) == 0 || strcmp( cmd, "map" ) == 0 )
+		else if ( strcmp( args, "" ) == 0 || strcmp( args, " " ) == 0 || strcmp( args, "list" ) == 0 )
+			ProfileInterface::ListProfiles();
+		else
+			cerr << "profile -> Invalid Syntax!" << endl;
+	}
+    else if ( strcmp( cmd, "default" ) == 0 )
     {
-        if ( CurrentProfile::fastDL == "" )
-        {
-            cerr << "The current profile has no fastdl set, so you cannot use this command." << endl;
-            return true;
-        }
+        defaultProfile = CurrentProfile::id;
+        cout << "The default profile is now " << "[" << defaultProfile << "] " << ProfileInterface::GetConfStrNested( defaultProfile, "profileName" );
 
-        CgeInterface::pullCurrentMap();
-        return true;
+        if ( ProfileInterface::GetConfStrNested( defaultProfile, "profileSeries" ) != "" && ProfileInterface::GetConfStrNested( defaultProfile, "profileSeries" ) != " " )
+                            cout << " (" << ProfileInterface::GetConfStrNested( defaultProfile, "profileSeries" ) << ")";
+        cout << endl;
+        ConfigInterface::UpdateConfInt( "defaultprofile", defaultProfile );
     }
-    else if ( strcmp( cmd, "view" ) == 0 )
-    {
-        if ( CurrentProfile::name != "cge7-193" )
-        {
-            cerr << "This command is only supported when using the \"cge7-193\" profile." << endl;
-            return true;
-        }
+    else if ( strcmp( cmd, "selector" ) == 0 )
+	{
+		useProfileSelector = !useProfileSelector;
+		cout << ( useProfileSelector ? "The profile selector will now launch on startup if multiple profiles are present." : "The profile selector will no longer launch on startup." ) << endl;
+		ConfigInterface::UpdateConfBool( "profileselector", useProfileSelector );
+	}
+	else if ( strcmp( cmd, "verbose" ) == 0 )
+	{
+		verbose = !verbose;
+		cout << ( verbose ? "Verbose Logging is now enabled." : "Verbose Logging is now disabled." ) << endl;
+		ConfigInterface::UpdateConfBool( "verbose", verbose );
+	}
+	else
+		return false;
 
-        if ( CurrentProfile::fastDL == "" )
-        {
-            cerr << "The current profile has no fastdl set, so you cannot use this command." << endl;
-            return true;
-        }
-
-        if ( strcmp( args, "full" ) == 0 )
-            FastDL::fastdl_macro_view();
-        else if ( strcmp( args, "" ) == 0 || strcmp( args, " " ) == 0 || strcmp( args, "min" ) == 0 )
-            FastDL::fastdl_macro_view_min();
-        else
-            cerr << "fastdl -> macro (view) -> Invalid Syntax!" << endl;
-            
-        return true;
-    }
-    else if ( strcmp( cmd, "scrape" ) == 0 )
-    {
-        if ( CurrentProfile::name != "cge7-193" )
-        {
-            cerr << "This command is only supported when using the \"cge7-193\" profile." << endl;
-            return true;
-        }
-
-        if ( CurrentProfile::fastDL == "" )
-        {
-            cerr << "The current profile has no fastdl set, so you cannot use this command." << endl;
-            return true;
-        }
-
-        if ( strcmp( args, "full" ) == 0 )
-            FastDL::fastdl_macro_scrape();
-        else if ( strcmp( args, "" ) == 0 || strcmp( args, " " ) == 0 || strcmp( args, "min" ) == 0 )
-            FastDL::fastdl_macro_scrape_min();
-        else
-            cerr << "fastdl -> macro (scrape) -> Invalid Syntax!" << endl;
-            
-        return true;
-    }
-    else if ( strcmp( cmd, "gamepath" ) == 0 )
-    {
-        while( !filesystem::is_directory( gamePath ) )
-        {
-            cout << "Please input a valid path to your " << CurrentProfile::game << " Install folder (without quotes)" << endl << ">> ";
-
-            gamePath.clear();
-
-            getline( cin, gamePath );
-        }
-
-        ConfigInterface::UpdateConfStr( CurrentProfile::game, gamePath );
-            
-        return true;
-    }
-    else if ( strcmp( cmd, "profile" ) == 0 )
-    {
-        if ( strcmp( args, "create" ) == 0 )
-            ProfileInterface::CreateProfile();
-        else if ( strcmp( args, "edit" ) == 0 )
-            ProfileInterface::EditProfile();
-        else if ( strcmp( args, "delete" ) == 0 )
-            ProfileInterface::DeleteProfile();
-        else if ( strcmp( args, "" ) == 0 || strcmp( args, " " ) == 0 || strcmp( args, "list" ) == 0 )
-            ProfileInterface::ListProfiles();
-        else
-            cerr << "profile -> Invalid Syntax!" << endl;
-            
-        return true;
-    }
-    else if ( strcmp( cmd, "verbose" ) == 0 )
-    {
-        verbose = !verbose;
-        cout << ( verbose ? "Verbose Logging is now enabled." : "Verbose Logging is now disabled" ) << endl;
-        ConfigInterface::UpdateConfBool( "verbose", verbose );
-        return true;
-    }
-    else
-    {
-        return false;
-    }
+	return true;
 }
 
 void multitool()
@@ -255,12 +258,43 @@ int main( int argc, char *argv[] )
     {
         shouldRestart = false;
 
+        cout << "Registering Configs...";
+
+ //       PWSTR *tmp = new wchar_t*;
+
+ //       SHGetKnownFolderPath( FOLDERID_RoamingAppData, 0, NULL, tmp );
+ //       wcstombs( appDataPath, *tmp, sizeof( char ) * MAX_PATH );
+
+ //       delete tmp;
+
+        bool validInstallPath = ConfigInterface::Init( resetSettings );
+
+        if ( !validInstallPath )
+        {
+            cout << " [ \033[31mFAILED\033[0m ]" << endl;
+            cout << "Prefrences file could not be found! A new one has been generated." << endl;
+        }
+        else
+        {
+            cout << " [ \033[34mDONE\033[0m ] " << endl;
+        }
+
+        verbose = ConfigInterface::GetConfBool( "verbose" );
+        defaultProfile = ConfigInterface::GetConfInt( "defaultprofile" );
+        useProfileSelector = ConfigInterface::GetConfBool( "profileselector" );
+
         cout << "Registering Profiles...";
 
         if ( !ProfileInterface::Init( resetProfiles ) )
         {
             cout << " [ \033[31mFAILED\033[0m ]" << endl;
-            cout << "Profile configuration file could not be found! A new one has been generated." << endl;
+
+			if ( resetProfiles )
+				cout << "You have passed the reset-profiles switch." << endl << "  Profiles have been reset to their defaults." << endl;
+			else
+            	cout << "Profile configuration file could not be found! A new one has been generated." << endl;
+			
+			cout << "Starting default profile..." << endl;
             ProfileInterface::LoadProfile( 1 );
         }
         else
@@ -269,14 +303,36 @@ int main( int argc, char *argv[] )
 
             if ( forcedProfile )
             {
+				cout << "You have passed the forced-profile switch." << endl << "  Profile #" << forcedProfile << " will now be loaded." << endl;
                 ProfileInterface::LoadProfile( forcedProfile );
                 forcedProfile = 0;
             }
             else if ( ProfileInterface::GetTotalProfiles() <= 1 )
+			{
+				cout << "Starting default profile..." << endl;
                 ProfileInterface::LoadProfile( 1 );
+			}
             else
             {
                 bool invalidSelection = true;
+
+                if ( !useProfileSelector && !shouldSwitchProfiles )
+                {
+                    cout << "Starting default profile...";
+                    if ( defaultProfile > 0 && defaultProfile <= ProfileInterface::GetTotalProfiles() )
+                    {
+                        cout << endl;
+                        ProfileInterface::LoadProfile( defaultProfile );
+                        invalidSelection = false;
+                    }
+                    else
+                    {
+                        cout << " [ \033[31mFAILED\033[0m ]" << endl;
+                        cerr << "The Profile ID assigned as the default profile is malformed or does not exist." << endl;
+                        defaultProfile = 1;
+                        ConfigInterface::UpdateConfInt( "defaultprofile", defaultProfile );
+                    }
+                }
 
                 cout << "Select a Profile" << endl << endl;
                 while ( invalidSelection )
@@ -315,15 +371,7 @@ int main( int argc, char *argv[] )
         }
 
         cout << "Registering Filepath...";
-
- //       PWSTR *tmp = new wchar_t*;
-
- //       SHGetKnownFolderPath( FOLDERID_RoamingAppData, 0, NULL, tmp );
- //       wcstombs( appDataPath, *tmp, sizeof( char ) * MAX_PATH );
-
- //       delete tmp;
-
-        if ( !ConfigInterface::Init( resetSettings ) )
+        if ( !validInstallPath )
         {
             cout << " [ \033[31mFAILED\033[0m ]" << endl;
 
@@ -363,8 +411,6 @@ int main( int argc, char *argv[] )
             {
                 cout << " [ \033[34mDONE\033[0m ] " << endl;
             }
-
-            verbose = ConfigInterface::GetConfBool( "verbose" );
         }
 
         cout << "Starting multitool..." << endl;
@@ -373,7 +419,7 @@ int main( int argc, char *argv[] )
         clrScr();
         cout << "Welcome to the \"cge7-193\" Multitool! v" << verMajor << "." << verMinor << endl;
         cout << "DEDICATED TO INTERLOPER -- OCTOBER 24TH 2025" << endl;
-        cout << "   (c) 2025 funniman.exe" << endl << endl;
+        cout << "   (c) 2026 funniman.exe" << endl << endl;
 
         multitool();
 

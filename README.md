@@ -1,5 +1,5 @@
 # The cge7-193 Multitool
-The cge7-193 Multitool is a CLI (Command Line Interface) created by funniman.exe to attempt to provide a user friendly interface for accessing information related to servers running on the Source Engine.
+The cge7-193 Multitool is a Command Line Interface (CLI) that attempts to provide a user friendly method for accessing information related to servers running on the Source Engine.
 <br>
 This tool was originally designed for use with the INTERLOPER ARG's "cge7-193" TF2 server (hence the multitool's name), but has since been expanded to support adding custom profiles with your own servers.
 
@@ -12,7 +12,7 @@ This tool was originally designed for use with the INTERLOPER ARG's "cge7-193" T
 - Server status
 - Configuration via `prefs.json`
 
-### Upcoming features
+### Planned features
 - Scraping for new/unknown Fastdl files
 - Scraping Filters
 
@@ -21,7 +21,7 @@ This tool was originally designed for use with the INTERLOPER ARG's "cge7-193" T
 - [The PicoSHA2 Header-only SHA256 Library](https://github.com/okdshin/PicoSHA2/blob/master/picosha2.h) (place into the `thirdparty` folder)
 - [The nlohmann JSON Parser](https://github.com/nlohmann/json/releases/download/v3.12.0/json.hpp) (place into the `thirdparty` folder)
 - [BinaryAlien's libssq](https://github.com/BinaryAlien/libssq) (clone repo to the `thirdparty` folder)
-- [CMake](https://cmake.org) (Ensure that `CMake` has been added to the `PATH`)
+- [CMake](https://cmake.org) (Ensure that `CMake` is launchable from anywhere)
 
 ### Compiler
 All official Windows builds have been built with [MinGW](https://www.mingw-w64.org/downloads/) (Ensure the `MinGW` `bin` folder is accessable via the `PATH`)<br>
@@ -58,7 +58,7 @@ cmake --build build
 cmake -B build -G "Ninja"
 cmake --build build
 ```
-The `cge-multitool.exe` executable will be built in the directory previously specified.
+The `cge-multitool` executable will be built in the directory previously specified.
 
 ## Isssues -- libssq
 - ### Cannot open include file: 'stdbool.h'

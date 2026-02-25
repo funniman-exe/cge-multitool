@@ -69,6 +69,8 @@ bool ConfigInterface::Init( bool resetSettings )
         ofstream out( tmp );
 
         conf[ "verbose" ] = false;
+        conf[ "defaultprofile" ] = 1;
+        conf[ "profileselector" ] = true;
         
         /*for ( int i = 1; i <= ProfileInterface::GetTotalProfiles(); i++ )
         {

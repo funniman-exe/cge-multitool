@@ -76,7 +76,7 @@ void CgeInterface::credits()
 
 void CgeInterface::help()
 {
-    cout << "The \"cge7-193\" Multitool v" << verMajor << "." << verMinor << endl << "   (c) 2025 funniman.exe" << endl << endl;
+    cout << "The \"cge7-193\" Multitool v" << verMajor << "." << verMinor << endl << "   (c) 2026 funniman.exe" << endl << endl;
     cout << "Command-line arguments:" << endl;
     cout << "   [-rs | --reset-settings] Reset settings" << endl;
     cout << "   [-rp | --reset-profiles] Reset profiles" << endl;
@@ -97,8 +97,10 @@ void CgeInterface::help()
     if ( CurrentProfile::fastDL != "" ) cout << "      Type \"current-map\" or \"map\" - Download the server's current map from fastdl." << endl << endl;
 
     cout << "Config options:" << endl;
-    cout << "   Type \"profile <list/create/edit/delete (assumes list)>\" - Edit the file path to the current profile's game." << endl;
+    cout << "   Type \"profile <list/create/edit/delete" << ( ProfileInterface::GetTotalProfiles() > 1 ? "/switch" : "" ) << " (assumes list)>\" - Edit various settings regarding profiles." << endl;
     cout << "   Type \"gamepath\" - Edit the file path to the current profile's game." << endl;
+    cout << "   Type \"default\" - Set the current profile as the startup profile." << endl;
+    cout << "   Type \"selector\" - Toggle launching the profile selector on startup." << endl;
     cout << "   Type \"verbose\" - Toggle Verbose mode." << endl;
 }
 

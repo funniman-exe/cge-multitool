@@ -1,8 +1,13 @@
 extern int forcedProfile;
 extern bool shouldExit;
 extern bool shouldRestart;
+extern bool shouldSwitchProfiles;
+
 extern string gamePath;
+
 extern bool verbose;
+extern int defaultProfile;
+extern bool useProfileSelector;
 
 extern bool quitFunc;
 
